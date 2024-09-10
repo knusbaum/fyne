@@ -38,6 +38,10 @@ func NewRadioGroup(options []string, changed func(string)) *RadioGroup {
 	return r
 }
 
+// func (r *RadioGroup) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(r, p)
+// }
+
 // Append adds a new option to the end of a RadioGroup widget.
 func (r *RadioGroup) Append(option string) {
 	r.Options = append(r.Options, option)

@@ -236,9 +236,6 @@ func (c *primaryColorButtonRenderer) Objects() []fyne.CanvasObject {
 	return c.objs
 }
 
-func (c *primaryColorButtonRenderer) Destroy() {
-}
-
 type previewTheme struct {
 	s *Settings
 	t fyne.Theme

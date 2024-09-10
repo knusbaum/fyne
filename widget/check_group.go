@@ -38,6 +38,20 @@ func NewCheckGroup(options []string, changed func([]string)) *CheckGroup {
 	return r
 }
 
+// func (r *CheckGroup) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(r, p)
+// 	// for _, o := range r.items {
+// 	// 	op := o.Position()
+// 	// 	if op.X < p.X && op.Y < p.Y {
+// 	// 		os := o.Size()
+// 	// 		if op.X+os.Width < p.X && op.Y+os.Height < p.Y {
+// 	// 			return o.ObjectAt(fyne.NewPos(p.X-op.X, p.Y-op.Y))
+// 	// 		}
+// 	// 	}
+// 	// }
+// 	// return r
+// }
+
 // Append adds a new option to the end of a CheckGroup widget.
 func (r *CheckGroup) Append(option string) {
 	r.Options = append(r.Options, option)

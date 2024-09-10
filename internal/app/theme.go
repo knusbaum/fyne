@@ -2,7 +2,6 @@ package app
 
 import (
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/internal/cache"
 )
 
 // ApplyThemeTo ensures that the specified canvasobject and all widgets and themeable objects will
@@ -14,10 +13,10 @@ func ApplyThemeTo(content fyne.CanvasObject, canv fyne.Canvas) {
 
 	switch o := content.(type) {
 	case fyne.Widget:
-		for _, co := range cache.Renderer(o).Objects() {
+		for _, co := range o.Renderer().Objects() {
 			ApplyThemeTo(co, canv)
 		}
-		cache.Renderer(o).Layout(content.Size()) // theme can cause sizing changes
+		o.Renderer().Layout(content.Size()) // theme can cause sizing changes
 	case *fyne.Container:
 		for _, co := range o.Objects {
 			ApplyThemeTo(co, canv)

@@ -2,6 +2,7 @@ package glfw
 
 import (
 	"context"
+	"fmt"
 	"image/color"
 	_ "image/png" // for the icon
 	"math"
@@ -16,7 +17,6 @@ import (
 	"fyne.io/fyne/v2/internal/build"
 	"fyne.io/fyne/v2/internal/cache"
 	"fyne.io/fyne/v2/internal/driver"
-	"fyne.io/fyne/v2/internal/driver/common"
 	"fyne.io/fyne/v2/internal/scale"
 )
 
@@ -223,11 +223,11 @@ func (w *window) Close() {
 		cache.RangeTexturesFor(w.canvas, w.canvas.Painter().Free)
 	})
 
-	w.canvas.WalkTrees(nil, func(node *common.RenderCacheNode, _ fyne.Position) {
-		if wid, ok := node.Obj().(fyne.Widget); ok {
-			cache.DestroyRenderer(wid)
-		}
-	})
+	// w.canvas.WalkTrees(nil, func(node *common.RenderCacheNode, _ fyne.Position) {
+	// 	if wid, ok := node.Obj().(fyne.Widget); ok {
+	// 		cache.DestroyRenderer(wid)
+	// 	}
+	// })
 }
 
 func (w *window) ShowAndRun() {
@@ -277,7 +277,7 @@ func (w *window) processClosed() {
 
 // destroy this window and, if it's the last window quit the app
 func (w *window) destroy(d *gLDriver) {
-	cache.CleanCanvas(w.canvas)
+	//cache.CleanCanvas(w.canvas)
 
 	if w.master {
 		d.Quit()
@@ -360,6 +360,7 @@ func (w *window) processMouseMoved(xpos float64, ypos float64) {
 
 	cursor := desktop.Cursor(desktop.DefaultCursor)
 
+	fmt.Printf("findObjectAtPositionMatching\n")
 	obj, pos, _ := w.findObjectAtPositionMatching(w.canvas, mousePos, func(object fyne.CanvasObject) bool {
 		if cursorable, ok := object.(desktop.Cursorable); ok {
 			cursor = cursorable.Cursor()

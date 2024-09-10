@@ -33,6 +33,10 @@ type radioItem struct {
 	onTap   func(item *radioItem)
 }
 
+// func (r *radioItem) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(r, p)
+// }
+
 // CreateRenderer is a private method to Fyne which links this widget to its renderer.
 //
 // Implements: fyne.Widget

@@ -27,12 +27,15 @@ func NewMenuBar(mainMenu *fyne.MainMenu, canvas fyne.Canvas) *MenuBar {
 	b := &MenuBar{Items: items, canvas: canvas}
 	b.ExtendBaseWidget(b)
 	for i, menu := range mainMenu.Items {
-		barItem := &menuBarItem{Menu: menu, Parent: b}
-		barItem.ExtendBaseWidget(barItem)
+		barItem := newMenuBarItem(menu, b)
 		items[i] = barItem
 	}
 	return b
 }
+
+// func (b *MenuBar) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(b, p)
+// }
 
 // CreateRenderer returns a new renderer for the menu bar.
 //
@@ -40,7 +43,7 @@ func NewMenuBar(mainMenu *fyne.MainMenu, canvas fyne.Canvas) *MenuBar {
 func (b *MenuBar) CreateRenderer() fyne.WidgetRenderer {
 	cont := container.NewHBox(b.Items...)
 	background := canvas.NewRectangle(theme.Color(theme.ColorNameBackground))
-	underlay := &menuBarUnderlay{action: b.deactivate}
+	underlay := newMenuBarUnderlay(b.deactivate)
 	underlay.ExtendBaseWidget(underlay)
 	objects := []fyne.CanvasObject{underlay, background, cont}
 	for _, item := range b.Items {
@@ -174,6 +177,16 @@ type menuBarUnderlay struct {
 var _ fyne.Widget = (*menuBarUnderlay)(nil)
 var _ fyne.Tappable = (*menuBarUnderlay)(nil)     // deactivate menu on click outside
 var _ desktop.Hoverable = (*menuBarUnderlay)(nil) // block hover events on main content
+
+func newMenuBarUnderlay(action func()) *menuBarUnderlay {
+	u := &menuBarUnderlay{action: action}
+	u.ExtendBaseWidget(u)
+	return u
+}
+
+// func (u *menuBarUnderlay) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(u, p)
+// }
 
 func (u *menuBarUnderlay) CreateRenderer() fyne.WidgetRenderer {
 	return &menuUnderlayRenderer{}

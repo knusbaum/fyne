@@ -20,6 +20,14 @@ type Line struct {
 
 	StrokeColor color.Color // The line stroke color
 	StrokeWidth float32     // The stroke width of the line
+	CanvasMixin
+}
+
+func (l *Line) ObjectAt(p fyne.Position, matches func(fyne.CanvasObject) bool) fyne.CanvasObject {
+	if matches(l) {
+		return l
+	}
+	return nil
 }
 
 // Size returns the current size of bounding box for this line object

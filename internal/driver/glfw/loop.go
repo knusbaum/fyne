@@ -95,7 +95,7 @@ func (d *gLDriver) drawSingleFrame() {
 		d.repaintWindow(w)
 		refreshingCanvases = append(refreshingCanvases, canvas)
 	}
-	cache.CleanCanvases(refreshingCanvases)
+	//cache.CleanCanvases(refreshingCanvases)
 
 	// cleanup refreshingCanvases slice
 	for i := 0; i < len(refreshingCanvases); i++ {
@@ -207,11 +207,11 @@ func (d *gLDriver) runGL() {
 func (d *gLDriver) repaintWindow(w *window) {
 	canvas := w.canvas
 	w.RunWithContext(func() {
-		if canvas.EnsureMinSize() {
-			w.viewLock.Lock()
-			w.shouldExpand = true
-			w.viewLock.Unlock()
-		}
+		// if canvas.EnsureMinSize() {
+		// 	w.viewLock.Lock()
+		// 	w.shouldExpand = true
+		// 	w.viewLock.Unlock()
+		// }
 		canvas.FreeDirtyTextures()
 
 		updateGLContext(w)

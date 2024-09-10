@@ -30,6 +30,13 @@ type Text struct {
 	FontSource fyne.Resource
 }
 
+func (t *Text) ObjectAt(p fyne.Position, matches func(fyne.CanvasObject) bool) fyne.CanvasObject {
+	if matches(t) {
+		return t
+	}
+	return nil
+}
+
 // Hide will set this text to not be visible
 func (t *Text) Hide() {
 	t.baseObject.Hide()

@@ -26,6 +26,10 @@ func NewAccordion(items ...*AccordionItem) *Accordion {
 	return a
 }
 
+// func (a *Accordion) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return a
+// }
+
 // Append adds the given item to this Accordion.
 func (a *Accordion) Append(item *AccordionItem) {
 	a.propertyLock.Lock()
@@ -255,7 +259,7 @@ func (r *accordionRenderer) updateObjects() {
 		}
 		h.Alignment = ButtonAlignLeading
 		h.IconPlacement = ButtonIconLeadingText
-		h.Hidden = false
+		h.Hidden.Store(false)
 		h.Importance = LowImportance
 		h.Text = ai.Title
 		index := i // capture

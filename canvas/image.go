@@ -72,6 +72,14 @@ type Image struct {
 	Translucency float64    // Set a translucency value > 0.0 to fade the image
 	FillMode     ImageFill  // Specify how the image should expand to fill or fit the available space
 	ScaleMode    ImageScale // Specify the type of scaling interpolation applied to the image
+	CanvasMixin
+}
+
+func (i *Image) ObjectAt(p fyne.Position, matches func(fyne.CanvasObject) bool) fyne.CanvasObject {
+	if matches(i) {
+		return i
+	}
+	return nil
 }
 
 // Alpha is a convenience function that returns the alpha value for an image

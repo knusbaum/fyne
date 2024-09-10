@@ -1,10 +1,11 @@
 package driver
 
 import (
+	"fmt"
 	"math"
+	"reflect"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/internal/cache"
 )
 
 // AbsolutePositionForObject returns the absolute position of an object in a set of object trees.
@@ -27,11 +28,36 @@ func AbsolutePositionForObject(object fyne.CanvasObject, trees []fyne.CanvasObje
 }
 
 // FindObjectAtPositionMatching is used to find an object in a canvas at the specified position.
-// The matches function determines of the type of object that is found at this position is of a suitable type.
+// The matches function determines if the type of object that is found at this position is of a suitable type.
 // The various canvas roots and overlays that can be searched are also passed in.
 func FindObjectAtPositionMatching(mouse fyne.Position, matches func(object fyne.CanvasObject) bool, overlay fyne.CanvasObject, roots ...fyne.CanvasObject) (fyne.CanvasObject, fyne.Position, int) {
 	var found fyne.CanvasObject
 	var foundPos fyne.Position
+	// fmt.Printf("FIND OBJECT AT POSITION MATCHING!\n")
+	// if overlay != nil {
+	// 	ro := overlay.ObjectAt(mouse, matches)
+	// 	if ro == nil {
+	// 		return nil, fyne.NewPos(0, 0), 0
+	// 	}
+	// 	foundPos = fyne.NewPos(mouse.X-ro.Position().X, mouse.Y-ro.Position().Y)
+	// 	fmt.Printf("Pointing at %#v\n", ro)
+	// 	return ro, foundPos, 0
+	// } else {
+	// 	for _, root := range roots {
+	// 		if root == nil {
+	// 			continue
+	// 		}
+	// 		ro := root.ObjectAt(mouse, matches)
+	// 		if ro == nil {
+	// 			fmt.Printf("RO NIL\n")
+	// 			return nil, fyne.NewPos(0, 0), 0
+	// 		}
+	// 		foundPos = fyne.NewPos(mouse.X-ro.Position().X, mouse.Y-ro.Position().Y)
+	// 		fmt.Printf("Pointing at %v %p (%v)\n", reflect.TypeOf(ro).String(), ro, matches(ro), mouse)
+	// 		return ro, foundPos, 0
+	// 	}
+
+	// }
 
 	findFunc := func(walked fyne.CanvasObject, pos fyne.Position, clipPos fyne.Position, clipSize fyne.Size) bool {
 		if !walked.Visible() {
@@ -95,7 +121,7 @@ func ReverseWalkVisibleObjectTree(
 	afterChildren func(fyne.CanvasObject, fyne.Position, fyne.CanvasObject),
 ) bool {
 	clipSize := fyne.NewSize(math.MaxInt32, math.MaxInt32)
-	return walkObjectTree(obj, true, nil, fyne.NewPos(0, 0), fyne.NewPos(0, 0), clipSize, beforeChildren, afterChildren, true)
+	return walkObjectTree(obj, true, nil, fyne.NewPos(0, 0), fyne.NewPos(0, 0), clipSize, beforeChildren, afterChildren, true, 0)
 }
 
 // WalkCompleteObjectTree will walk an object tree for all objects (ignoring visible state) executing the passed
@@ -113,7 +139,7 @@ func WalkCompleteObjectTree(
 	afterChildren func(fyne.CanvasObject, fyne.Position, fyne.CanvasObject),
 ) bool {
 	clipSize := fyne.NewSize(math.MaxInt32, math.MaxInt32)
-	return walkObjectTree(obj, false, nil, fyne.NewPos(0, 0), fyne.NewPos(0, 0), clipSize, beforeChildren, afterChildren, false)
+	return walkObjectTree(obj, false, nil, fyne.NewPos(0, 0), fyne.NewPos(0, 0), clipSize, beforeChildren, afterChildren, false, 0)
 }
 
 // WalkVisibleObjectTree will walk an object tree for all visible objects executing the passed functions following
@@ -131,7 +157,7 @@ func WalkVisibleObjectTree(
 	afterChildren func(fyne.CanvasObject, fyne.Position, fyne.CanvasObject),
 ) bool {
 	clipSize := fyne.NewSize(math.MaxInt32, math.MaxInt32)
-	return walkObjectTree(obj, false, nil, fyne.NewPos(0, 0), fyne.NewPos(0, 0), clipSize, beforeChildren, afterChildren, true)
+	return walkObjectTree(obj, false, nil, fyne.NewPos(0, 0), fyne.NewPos(0, 0), clipSize, beforeChildren, afterChildren, true, 0)
 }
 
 func walkObjectTree(
@@ -143,6 +169,7 @@ func walkObjectTree(
 	beforeChildren func(fyne.CanvasObject, fyne.Position, fyne.Position, fyne.Size) bool,
 	afterChildren func(fyne.CanvasObject, fyne.Position, fyne.CanvasObject),
 	requireVisible bool,
+	level int,
 ) bool {
 	if obj == nil {
 		return false
@@ -152,14 +179,21 @@ func walkObjectTree(
 	}
 	pos := obj.Position().Add(offset)
 
+	//fmt.Printf("(%d)Looking at %v\n", level, reflect.TypeOf(obj).String())
+
 	var children []fyne.CanvasObject
 	switch co := obj.(type) {
 	case *fyne.Container:
 		children = co.Objects
 	case fyne.Widget:
-		if cache.IsRendered(co) || requireVisible {
-			children = cache.Renderer(co).Objects()
+		//if cache.IsRendered(co) || requireVisible {
+		if co.Renderer() == nil {
+			fmt.Printf("NO RENDERER ON TYPE %v\n", reflect.TypeOf(co).String())
+			//os.Exit(1)
+		} else {
+			children = co.Renderer().Objects()
 		}
+		//}
 	}
 
 	if _, ok := obj.(fyne.Scrollable); ok {
@@ -175,7 +209,7 @@ func walkObjectTree(
 
 	cancelled := false
 	followChild := func(child fyne.CanvasObject) bool {
-		if walkObjectTree(child, reverse, obj, pos, clipPos, clipSize, beforeChildren, afterChildren, requireVisible) {
+		if walkObjectTree(child, reverse, obj, pos, clipPos, clipSize, beforeChildren, afterChildren, requireVisible, level+1) {
 			cancelled = true
 			return true
 		}

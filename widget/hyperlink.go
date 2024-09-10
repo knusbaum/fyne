@@ -61,6 +61,10 @@ func NewHyperlinkWithStyle(text string, url *url.URL, alignment fyne.TextAlign, 
 	return hl
 }
 
+// func (h *Hyperlink) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(h, p)
+// }
+
 // CreateRenderer is a private method to Fyne which links this widget to its renderer
 func (hl *Hyperlink) CreateRenderer() fyne.WidgetRenderer {
 	hl.ExtendBaseWidget(hl)
@@ -304,9 +308,6 @@ type hyperlinkRenderer struct {
 	under *canvas.Rectangle
 
 	objects []fyne.CanvasObject
-}
-
-func (r *hyperlinkRenderer) Destroy() {
 }
 
 func (r *hyperlinkRenderer) Layout(s fyne.Size) {

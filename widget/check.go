@@ -49,6 +49,10 @@ func NewCheckWithData(label string, data binding.Bool) *Check {
 	return check
 }
 
+// func (c *Check) ObjectAt(fyne.Position) fyne.CanvasObject {
+// 	return c
+// }
+
 // Bind connects the specified data source to this Check.
 // The current value will be displayed and any changes in the data will cause the widget to update.
 // User interactions with this Check will set the value into the data source.

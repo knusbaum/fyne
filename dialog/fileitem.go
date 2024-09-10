@@ -30,6 +30,10 @@ type fileDialogItem struct {
 	lastClick time.Time
 }
 
+// func (i *fileDialogItem) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(i, p)
+// }
+
 func (i *fileDialogItem) CreateRenderer() fyne.WidgetRenderer {
 	text := widget.NewLabelWithStyle(i.name, fyne.TextAlignCenter, fyne.TextStyle{})
 	text.Truncation = fyne.TextTruncateEllipsis
@@ -141,7 +145,4 @@ func (s *fileItemRenderer) Refresh() {
 
 func (s *fileItemRenderer) Objects() []fyne.CanvasObject {
 	return s.objects
-}
-
-func (s *fileItemRenderer) Destroy() {
 }

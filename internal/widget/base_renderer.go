@@ -13,12 +13,6 @@ func NewBaseRenderer(objects []fyne.CanvasObject) BaseRenderer {
 	return BaseRenderer{objects}
 }
 
-// Destroy does nothing in the base implementation.
-//
-// Implements: fyne.WidgetRenderer
-func (r *BaseRenderer) Destroy() {
-}
-
 // Objects returns the objects that should be rendered.
 //
 // Implements: fyne.WidgetRenderer

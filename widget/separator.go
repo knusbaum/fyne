@@ -28,6 +28,10 @@ func NewSeparator() *Separator {
 	return s
 }
 
+// func (s *Separator) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return s
+// }
+
 // CreateRenderer returns a new renderer for the separator.
 //
 // Implements: fyne.Widget

@@ -74,6 +74,10 @@ func newColorAdvancedPicker(color color.Color, onChange func(color.Color)) *colo
 	return c
 }
 
+// func (p *colorAdvancedPicker) ObjectAt(po fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(p, po)
+// }
+
 // Color returns the currently selected color.
 func (p *colorAdvancedPicker) Color() color.Color {
 	return &color.NRGBA{

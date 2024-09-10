@@ -6,7 +6,6 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/internal/cache"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 )
@@ -68,6 +67,10 @@ type Form struct {
 	validationError     error
 }
 
+// func (f *Form) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(f, p)
+// }
+
 // Append adds a new row to the form, using the text as a label next to the specified Widget
 func (f *Form) Append(text string, widget fyne.CanvasObject) {
 	item := &FormItem{Text: text, Widget: widget}
@@ -97,7 +100,7 @@ func (f *Form) MinSize() fyne.Size {
 // Refresh updates the widget state when requested.
 func (f *Form) Refresh() {
 	f.ExtendBaseWidget(f)
-	cache.Renderer(f.super()) // we are about to make changes to renderer created content... not great!
+	f.super().Renderer() // we are about to make changes to renderer created content... not great!
 	f.ensureRenderItems()
 	f.updateButtons()
 	f.updateLabels()
@@ -396,8 +399,11 @@ func (f *Form) updateLabels() {
 func (f *Form) CreateRenderer() fyne.WidgetRenderer {
 	f.ExtendBaseWidget(f)
 	th := f.Theme()
-	f.cancelButton = &Button{Icon: th.Icon(theme.IconNameCancel), OnTapped: f.OnCancel}
-	f.submitButton = &Button{Icon: th.Icon(theme.IconNameConfirm), OnTapped: f.OnSubmit, Importance: HighImportance}
+	f.cancelButton = NewButtonWithIcon("", th.Icon(theme.IconNameCancel), f.OnCancel)
+	//f.cancelButton = &Button{Icon: th.Icon(theme.IconNameCancel), OnTapped: f.OnCancel}
+	f.submitButton = NewButtonWithIcon("", th.Icon(theme.IconNameConfirm), f.OnSubmit)
+	f.submitButton.Importance = HighImportance
+	//f.submitButton = &Button{Icon: th.Icon(theme.IconNameConfirm), OnTapped: f.OnSubmit, Importance: HighImportance}
 	buttons := &fyne.Container{Layout: layout.NewGridLayoutWithRows(1), Objects: []fyne.CanvasObject{f.cancelButton, f.submitButton}}
 	f.buttonBox = &fyne.Container{Layout: layout.NewBorderLayout(nil, nil, nil, buttons), Objects: []fyne.CanvasObject{buttons}}
 	f.validationError = errFormItemInitialState // set initial state error to guarantee next error (if triggers) is always different

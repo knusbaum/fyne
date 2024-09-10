@@ -160,6 +160,10 @@ func newThemedBackground() *themedBackground {
 	return t
 }
 
+// func (t *themedBackground) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(t, p)
+// }
+
 func (t *themedBackground) CreateRenderer() fyne.WidgetRenderer {
 	t.ExtendBaseWidget(t)
 	rect := canvas.NewRectangle(theme.Color(theme.ColorNameOverlayBackground))
@@ -169,9 +173,6 @@ func (t *themedBackground) CreateRenderer() fyne.WidgetRenderer {
 type themedBackgroundRenderer struct {
 	rect    *canvas.Rectangle
 	objects []fyne.CanvasObject
-}
-
-func (renderer *themedBackgroundRenderer) Destroy() {
 }
 
 func (renderer *themedBackgroundRenderer) Layout(size fyne.Size) {

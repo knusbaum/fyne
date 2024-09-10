@@ -18,6 +18,13 @@ type LinearGradient struct {
 	Angle      float64     // The angle of the gradient (0/180 for vertical; 90/270 for horizontal)
 }
 
+func (g *LinearGradient) ObjectAt(p fyne.Position, matches func(fyne.CanvasObject) bool) fyne.CanvasObject {
+	if matches(g) {
+		return g
+	}
+	return nil
+}
+
 // Generate calculates an image of the gradient with the specified width and height.
 func (g *LinearGradient) Generate(iw, ih int) image.Image {
 	w, h := float64(iw), float64(ih)
@@ -99,6 +106,13 @@ type RadialGradient struct {
 	// This is not a DP measure but relates to the width/height.
 	// A value of 0.5 would move the center by the half width/height.
 	CenterOffsetX, CenterOffsetY float64
+}
+
+func (g *RadialGradient) ObjectAt(p fyne.Position, matches func(fyne.CanvasObject) bool) fyne.CanvasObject {
+	if matches(g) {
+		return g
+	}
+	return nil
 }
 
 // Generate calculates an image of the gradient with the specified width and height.

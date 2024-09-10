@@ -37,6 +37,10 @@ func NewInnerWindow(title string, content fyne.CanvasObject) *InnerWindow {
 	return w
 }
 
+// func (w *InnerWindow) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(w, p)
+// }
+
 func (w *InnerWindow) Close() {
 	w.Hide()
 }
@@ -209,6 +213,10 @@ func newDraggableCorner(w *InnerWindow) *draggableCorner {
 	d.ExtendBaseWidget(d)
 	return d
 }
+
+// func (c *draggableCorner) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(c, p)
+// }
 
 func (c *draggableCorner) CreateRenderer() fyne.WidgetRenderer {
 	prop := canvas.NewImageFromResource(fyne.CurrentApp().Settings().Theme().Icon(theme.IconNameDragCornerIndicator))

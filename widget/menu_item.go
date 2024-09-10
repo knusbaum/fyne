@@ -57,6 +57,10 @@ func newMenuItem(item *fyne.MenuItem, parent *Menu) *menuItem {
 	return i
 }
 
+// func (m *menuItem) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(m, p)
+// }
+
 func (i *menuItem) Child() *Menu {
 	if i.Item.ChildMenu != nil && i.child == nil {
 		child := NewMenu(i.Item.ChildMenu)

@@ -49,6 +49,10 @@ func newSplitContainer(horizontal bool, leading, trailing fyne.CanvasObject) *Sp
 	return s
 }
 
+// func (s *Split) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(s, p)
+// }
+
 // CreateRenderer is a private method to Fyne which links this widget to its renderer
 func (s *Split) CreateRenderer() fyne.WidgetRenderer {
 	s.BaseWidget.ExtendBaseWidget(s)
@@ -85,9 +89,6 @@ type splitContainerRenderer struct {
 	split   *Split
 	divider *divider
 	objects []fyne.CanvasObject
-}
-
-func (r *splitContainerRenderer) Destroy() {
 }
 
 func (r *splitContainerRenderer) Layout(size fyne.Size) {
@@ -233,6 +234,10 @@ func newDivider(split *Split) *divider {
 	return d
 }
 
+// func (d *divider) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(d, p)
+// }
+
 // CreateRenderer is a private method to Fyne which links this widget to its renderer
 func (d *divider) CreateRenderer() fyne.WidgetRenderer {
 	d.ExtendBaseWidget(d)
@@ -311,9 +316,6 @@ type dividerRenderer struct {
 	background *canvas.Rectangle
 	foreground *canvas.Rectangle
 	objects    []fyne.CanvasObject
-}
-
-func (r *dividerRenderer) Destroy() {
 }
 
 func (r *dividerRenderer) Layout(size fyne.Size) {

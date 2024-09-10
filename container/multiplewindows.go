@@ -30,6 +30,10 @@ func NewMultipleWindows(wins ...*InnerWindow) *MultipleWindows {
 	return m
 }
 
+// func (m *MultipleWindows) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(m, p)
+// }
+
 func (m *MultipleWindows) Add(w *InnerWindow) {
 	m.Windows = append(m.Windows, w)
 	m.refreshChildren()

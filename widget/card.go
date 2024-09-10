@@ -31,6 +31,10 @@ func NewCard(title, subtitle string, content fyne.CanvasObject) *Card {
 	return card
 }
 
+// func (c *Card) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(c, p)
+// }
+
 // CreateRenderer is a private method to Fyne which links this widget to its renderer
 func (c *Card) CreateRenderer() fyne.WidgetRenderer {
 	c.ExtendBaseWidget(c)

@@ -17,11 +17,33 @@ import (
 type BaseWidget struct {
 	size     async.Size
 	position async.Position
-	Hidden   bool
+	Hidden   atomic.Bool
 
 	impl         atomic.Pointer[fyne.Widget]
 	propertyLock sync.RWMutex
 	themeCache   fyne.Theme
+	renderer     fyne.WidgetRenderer
+	canvas.CanvasMixin
+}
+
+func (w *BaseWidget) ObjectAt(p fyne.Position, matches func(fyne.CanvasObject) bool) fyne.CanvasObject {
+	return fyne.WidgetRendererObjectAt(w.super(), p, matches)
+}
+
+// Renderer returns the renderer for the widget
+func (w *BaseWidget) Renderer() fyne.WidgetRenderer {
+	if w == nil {
+		panic("RENDERER ON NIL OBJECT")
+	}
+	if w.renderer == nil {
+		s := w.super()
+		if s == nil {
+			return nil
+		}
+		w.renderer = w.super().CreateRenderer()
+		w.renderer.Refresh()
+	}
+	return w.renderer
 }
 
 // ExtendBaseWidget is used by an extending widget to make use of BaseWidget functionality.
@@ -52,7 +74,7 @@ func (w *BaseWidget) Resize(size fyne.Size) {
 	if impl == nil {
 		return
 	}
-	cache.Renderer(impl).Layout(size)
+	w.Renderer().Layout(size)
 }
 
 // Position gets the current position of this widget, relative to its parent.
@@ -69,9 +91,7 @@ func (w *BaseWidget) Move(pos fyne.Position) {
 
 // MinSize for the widget - it should never be resized below this value.
 func (w *BaseWidget) MinSize() fyne.Size {
-	impl := w.super()
-
-	r := cache.Renderer(impl)
+	r := w.Renderer()
 	if r == nil {
 		return fyne.Size{}
 	}
@@ -82,10 +102,10 @@ func (w *BaseWidget) MinSize() fyne.Size {
 // Visible returns whether or not this widget should be visible.
 // Note that this may not mean it is currently visible if a parent has been hidden.
 func (w *BaseWidget) Visible() bool {
-	w.propertyLock.RLock()
-	defer w.propertyLock.RUnlock()
+	//w.propertyLock.RLock()
+	//defer w.propertyLock.RUnlock()
 
-	return !w.Hidden
+	return !w.Hidden.Load()
 }
 
 // Show this widget so it becomes visible
@@ -94,9 +114,9 @@ func (w *BaseWidget) Show() {
 		return
 	}
 
-	w.propertyLock.Lock()
-	w.Hidden = false
-	w.propertyLock.Unlock()
+	//w.propertyLock.Lock()
+	w.Hidden.Store(false)
+	//w.propertyLock.Unlock()
 
 	impl := w.super()
 	if impl == nil {
@@ -111,9 +131,9 @@ func (w *BaseWidget) Hide() {
 		return
 	}
 
-	w.propertyLock.Lock()
-	w.Hidden = true
-	w.propertyLock.Unlock()
+	//w.propertyLock.Lock()
+	w.Hidden.Store(true)
+	//w.propertyLock.Unlock()
 
 	impl := w.super()
 	if impl == nil {
@@ -133,7 +153,7 @@ func (w *BaseWidget) Refresh() {
 	w.themeCache = nil
 	w.propertyLock.Unlock()
 
-	render := cache.Renderer(impl)
+	render := w.Renderer()
 	render.Refresh()
 }
 

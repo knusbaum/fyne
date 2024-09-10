@@ -109,6 +109,10 @@ type ProgressBar struct {
 	binder basicBinder
 }
 
+// func (p *ProgressBar) ObjectAt(po fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(p, po)
+// }
+
 // Bind connects the specified data source to this ProgressBar.
 // The current value will be displayed and any changes in the data will cause the widget to update.
 //

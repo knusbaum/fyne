@@ -562,9 +562,6 @@ type markupRendererTestWidgetRenderer struct {
 	w *markupRendererTestWidget
 }
 
-func (r *markupRendererTestWidgetRenderer) Destroy() {
-}
-
 func (r *markupRendererTestWidgetRenderer) Layout(_ fyne.Size) {
 }
 

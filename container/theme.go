@@ -37,6 +37,10 @@ func NewThemeOverride(obj fyne.CanvasObject, th fyne.Theme) *ThemeOverride {
 	return t
 }
 
+// func (t *ThemeOverride) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(t, p)
+// }
+
 func (t *ThemeOverride) CreateRenderer() fyne.WidgetRenderer {
 	cache.OverrideTheme(t.Content, t.Theme)
 

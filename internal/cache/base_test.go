@@ -216,7 +216,6 @@ type dummyCanvas struct {
 
 type dummyWidget struct {
 	fyne.Widget
-	onDestroy func()
 }
 
 func (w *dummyWidget) CreateRenderer() fyne.WidgetRenderer {
@@ -226,12 +225,6 @@ func (w *dummyWidget) CreateRenderer() fyne.WidgetRenderer {
 type dummyWidgetRenderer struct {
 	widget  *dummyWidget
 	objects []fyne.CanvasObject
-}
-
-func (r *dummyWidgetRenderer) Destroy() {
-	if r.widget.onDestroy != nil {
-		r.widget.onDestroy()
-	}
 }
 
 func (r *dummyWidgetRenderer) Layout(size fyne.Size) {

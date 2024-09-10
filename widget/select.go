@@ -47,6 +47,10 @@ func NewSelect(options []string, changed func(string)) *Select {
 	return s
 }
 
+// func (s *Select) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(s, p)
+// }
+
 // ClearSelected clears the current option of the select widget.  After
 // clearing the current option, the Select widget's PlaceHolder will
 // be displayed.
@@ -301,8 +305,6 @@ type selectRenderer struct {
 func (s *selectRenderer) Objects() []fyne.CanvasObject {
 	return s.objects
 }
-
-func (s *selectRenderer) Destroy() {}
 
 // Layout the components of the button widget
 func (s *selectRenderer) Layout(size fyne.Size) {

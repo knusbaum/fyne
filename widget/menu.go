@@ -30,6 +30,10 @@ func NewMenu(menu *fyne.Menu) *Menu {
 	return m
 }
 
+// func (m *Menu) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(m, p)
+// }
+
 // ActivateLastSubmenu finds the last active menu item traversing through the open submenus
 // and activates its submenu if any.
 // It returns `true` if there was a submenu and it was activated and `false` elsewhere.
@@ -321,6 +325,10 @@ func newMenuBox(items []fyne.CanvasObject) *menuBox {
 	b.ExtendBaseWidget(b)
 	return b
 }
+
+// func (m *menuBox) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(m, p)
+// }
 
 func (b *menuBox) CreateRenderer() fyne.WidgetRenderer {
 	th := b.Theme()

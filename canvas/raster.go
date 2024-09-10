@@ -23,6 +23,15 @@ type Raster struct {
 	// Specify the type of scaling interpolation applied to the raster if it is not full-size
 	// Since: 1.4.1
 	ScaleMode ImageScale
+
+	CanvasMixin
+}
+
+func (r *Raster) ObjectAt(p fyne.Position, matches func(fyne.CanvasObject) bool) fyne.CanvasObject {
+	if matches(r) {
+		return r
+	}
+	return nil
 }
 
 // Alpha is a convenience function that returns the alpha value for a raster

@@ -24,6 +24,16 @@ type menuBarItem struct {
 	hovered bool
 }
 
+func newMenuBarItem(menu *fyne.Menu, parent *MenuBar) *menuBarItem {
+	i := &menuBarItem{Menu: menu, Parent: parent}
+	i.ExtendBaseWidget(i)
+	return i
+}
+
+// func (i *menuBarItem) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(i, p)
+// }
+
 func (i *menuBarItem) Child() *publicWidget.Menu {
 	if i.child == nil {
 		child := publicWidget.NewMenu(i.Menu)

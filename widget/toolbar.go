@@ -101,6 +101,10 @@ type Toolbar struct {
 	Items []ToolbarItem
 }
 
+// func (t *Toolbar) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(t, p)
+// }
+
 // CreateRenderer is a private method to Fyne which links this widget to its renderer
 func (t *Toolbar) CreateRenderer() fyne.WidgetRenderer {
 	t.ExtendBaseWidget(t)

@@ -1,5 +1,10 @@
 package fyne
 
+import (
+	"fmt"
+	"reflect"
+)
+
 // CanvasObject describes any graphical object that can be added to a canvas.
 // Objects have a size and position that can be controlled through this API.
 // MinSize is used to determine the minimum size which this object should be displayed.
@@ -34,6 +39,14 @@ type CanvasObject interface {
 
 	// Refresh must be called if this object should be redrawn because its inner state changed.
 	Refresh()
+
+	SetCanvas(c Canvas, setup func())
+	Canvas() Canvas
+
+	// ObjectAt returns a child object at position, relative to the position of this
+	// object, or this object if there are no children at the position, for which the
+	// function returns true
+	ObjectAt(Position, func(CanvasObject) bool) CanvasObject
 }
 
 // Disableable describes any CanvasObject that can be disabled.
@@ -104,4 +117,62 @@ type Tabbable interface {
 // This should be implemented by buttons etc that wish to handle pointer interactions.
 type Tappable interface {
 	Tapped(*PointEvent)
+}
+
+func WidgetRendererObjectAt(co CanvasObject, p Position, matches func(CanvasObject) bool) CanvasObject {
+	if co == nil {
+		return nil
+	}
+
+	var objects []CanvasObject
+	switch cot := co.(type) {
+	case *Container:
+		objects = cot.Objects
+	case Widget:
+		r := cot.Renderer()
+		if r == nil {
+			fmt.Printf("Renderer for %v is nil", co)
+			if matches(co) && co.Visible() {
+				return co
+			}
+			return nil
+		}
+		objects = r.Objects()
+	}
+
+	fmt.Printf("Checking %p(%v)\n", co, reflect.TypeOf(co).String())
+	// TODO: is this a good idea? Presumably all the visible objects are
+	// members of the renderer. Compare with Container.ObjectAt in /container.go
+	for _, o := range objects {
+		fmt.Printf("_checking %p(%v) at %v\n", o, reflect.TypeOf(o).String(), p)
+		// op := o.Position()
+		// if found := o.ObjectAt(NewPos(p.X-op.X, p.Y-op.Y), matches); found != nil {
+		// 	return found
+		// }
+		// if matches(o) {
+		// 	return o
+		// }
+		op := o.Position()
+		os := o.Size()
+		fmt.Printf("POS: %v, OPOS: %v, OSIZE: %v\n", p, op, os)
+		if op.X < p.X && op.Y < p.Y {
+			if op.X+os.Width > p.X && op.Y+os.Height > p.Y {
+				np := NewPos(p.X-op.X, p.Y-op.Y)
+				fmt.Printf("Looking for children of %p at %v\n", o, np)
+				if found := o.ObjectAt(np, matches); found != nil {
+					fmt.Printf("FOUND %p(%v)\n", o, reflect.TypeOf(o))
+					return found
+				}
+				if matches(o) && o.Visible() {
+					// TODO: probably unnecessary. o should already
+					// return itself if it matches.
+					return o
+				}
+			}
+		}
+	}
+	if matches(co) && co.Visible() {
+		return co
+	}
+	return nil
 }

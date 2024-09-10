@@ -31,6 +31,10 @@ func NewActivity() *Activity {
 	return a
 }
 
+// func (a *Activity) ObjectAt(fyne.Position) fyne.CanvasObject {
+// 	return a
+// }
+
 func (a *Activity) MinSize() fyne.Size {
 	a.ExtendBaseWidget(a)
 	return a.BaseWidget.MinSize()
@@ -85,11 +89,6 @@ type activityRenderer struct {
 	maxCol     color.NRGBA
 	maxRad     float32
 	wasStarted bool
-}
-
-func (a *activityRenderer) Destroy() {
-	a.parent.started.Store(false)
-	a.stop()
 }
 
 func (a *activityRenderer) Layout(size fyne.Size) {

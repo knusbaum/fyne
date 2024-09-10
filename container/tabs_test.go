@@ -8,15 +8,16 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/internal/cache"
 	"fyne.io/fyne/v2/test"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
 func TestTabButton_Icon_Change(t *testing.T) {
-	b := &tabButton{icon: theme.CancelIcon()}
-	r := cache.Renderer(b)
+	//b := &tabButton{icon: theme.CancelIcon()}
+	b := newTabButton(nil, nil)
+	b.icon = theme.CancelIcon()
+	r := b.Renderer()
 	icon := r.Objects()[3].(*canvas.Image)
 	oldResource := icon.Resource
 

@@ -4,7 +4,6 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/internal/cache"
 	"fyne.io/fyne/v2/theme"
 )
 
@@ -68,6 +67,10 @@ type scrollBar struct {
 	dragStart       float32
 	orientation     scrollBarOrientation
 }
+
+// func (b *scrollBar) ObjectAt(fyne.Position) fyne.CanvasObject {
+// 	return b
+// }
 
 func (b *scrollBar) CreateRenderer() fyne.WidgetRenderer {
 	th := theme.CurrentForWidget(b)
@@ -372,7 +375,7 @@ func (r *scrollContainerRenderer) updatePosition() {
 	if r.scroll.Direction == ScrollVerticalOnly || r.scroll.Direction == ScrollBoth {
 		r.handleAreaVisibility(contentSize.Height, scrollSize.Height, r.vertArea)
 		r.handleShadowVisibility(r.scroll.Offset.Y, contentSize.Height, scrollSize.Height, r.topShadow, r.bottomShadow)
-		cache.Renderer(r.vertArea).Layout(scrollSize)
+		r.vertArea.Renderer().Layout(scrollSize)
 	} else {
 		r.vertArea.Hide()
 		r.topShadow.Hide()
@@ -381,7 +384,7 @@ func (r *scrollContainerRenderer) updatePosition() {
 	if r.scroll.Direction == ScrollHorizontalOnly || r.scroll.Direction == ScrollBoth {
 		r.handleAreaVisibility(contentSize.Width, scrollSize.Width, r.horizArea)
 		r.handleShadowVisibility(r.scroll.Offset.X, contentSize.Width, scrollSize.Width, r.leftShadow, r.rightShadow)
-		cache.Renderer(r.horizArea).Layout(scrollSize)
+		r.horizArea.Renderer().Layout(scrollSize)
 	} else {
 		r.horizArea.Hide()
 		r.leftShadow.Hide()
@@ -409,6 +412,17 @@ type Scroll struct {
 	// Since: 2.0
 	OnScrolled func(fyne.Position) `json:"-"`
 }
+
+// func (s *Scroll) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	op := s.Content.Position()
+// 	if op.X < p.X && op.Y < p.Y {
+// 		os := s.Content.Size()
+// 		if op.X+os.Width < p.X && op.Y+os.Height < p.Y {
+// 			return s.Content.ObjectAt(fyne.NewPos(p.X-op.X, p.Y-op.Y))
+// 		}
+// 	}
+// 	return s
+// }
 
 // CreateRenderer is a private method to Fyne which links this widget to its renderer
 func (s *Scroll) CreateRenderer() fyne.WidgetRenderer {

@@ -475,6 +475,10 @@ func newRichImage(u fyne.URI, align fyne.TextAlign) *richImage {
 	return i
 }
 
+// func (r *richImage) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(r, p)
+// }
+
 func (r *richImage) CreateRenderer() fyne.WidgetRenderer {
 	r.layout = &fyne.Container{Layout: &richImageLayout{r}, Objects: []fyne.CanvasObject{r.img}}
 	return NewSimpleRenderer(r.layout)

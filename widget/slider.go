@@ -64,6 +64,10 @@ func NewSliderWithData(min, max float64, data binding.Float) *Slider {
 	return slider
 }
 
+// func (s *Slider) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(s, p)
+// }
+
 // Bind connects the specified data source to this Slider.
 // The current value will be displayed and any changes in the data will cause the widget to update.
 // User interactions with this Slider will set the value into the data source.

@@ -32,6 +32,10 @@ func newColorButton(color color.Color, onTap func(color.Color)) *colorButton {
 	return b
 }
 
+// func (b *colorButton) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(b, p)
+// }
+
 // CreateRenderer is a private method to Fyne which links this widget to its renderer
 func (b *colorButton) CreateRenderer() fyne.WidgetRenderer {
 	b.ExtendBaseWidget(b)

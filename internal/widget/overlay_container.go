@@ -25,6 +25,17 @@ func NewOverlayContainer(c fyne.CanvasObject, canvas fyne.Canvas, onDismiss func
 	return o
 }
 
+// func (o *OverlayContainer) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	op := o.Content.Position()
+// 	if op.X < p.X && op.Y < p.Y {
+// 		os := o.Content.Size()
+// 		if op.X+os.Width < p.X && op.Y+os.Height < p.Y {
+// 			return o.Content.ObjectAt(fyne.NewPos(p.X-op.X, p.Y-op.Y))
+// 		}
+// 	}
+// 	return o
+// }
+
 // CreateRenderer returns a new renderer for the overlay container.
 //
 // Implements: fyne.Widget

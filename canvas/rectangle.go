@@ -22,6 +22,13 @@ type Rectangle struct {
 	CornerRadius float32
 }
 
+func (r *Rectangle) ObjectAt(p fyne.Position, matches func(fyne.CanvasObject) bool) fyne.CanvasObject {
+	if matches(r) {
+		return r
+	}
+	return nil
+}
+
 // Hide will set this rectangle to not be visible
 func (r *Rectangle) Hide() {
 	r.baseObject.Hide()

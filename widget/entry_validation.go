@@ -85,6 +85,17 @@ func newValidationStatus(e *Entry) *validationStatus {
 	return rs
 }
 
+// func (r *validationStatus) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	op := r.entry.Position()
+// 	if op.X < p.X && op.Y < p.Y {
+// 		os := r.entry.Size()
+// 		if op.X+os.Width < p.X && op.Y+os.Height < p.Y {
+// 			return r.entry.ObjectAt(fyne.NewPos(p.X-op.X, p.Y-op.Y))
+// 		}
+// 	}
+// 	return r
+// }
+
 func (r *validationStatus) CreateRenderer() fyne.WidgetRenderer {
 	icon := &canvas.Image{}
 	icon.Hide()

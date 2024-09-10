@@ -13,7 +13,6 @@ import (
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/driver/mobile"
-	"fyne.io/fyne/v2/internal/cache"
 	"fyne.io/fyne/v2/internal/widget"
 	"fyne.io/fyne/v2/lang"
 	"fyne.io/fyne/v2/theme"
@@ -140,6 +139,10 @@ func NewPasswordEntry() *Entry {
 	return e
 }
 
+// func (e *Entry) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(e, p)
+// }
+
 // AcceptsTab returns if Entry accepts the Tab key or not.
 //
 // Implements: fyne.Tabbable
@@ -185,7 +188,7 @@ func (e *Entry) CreateRenderer() fyne.WidgetRenderer {
 	cursor.Hide()
 
 	e.cursorAnim = newEntryCursorAnimation(cursor)
-	e.content = &entryContent{entry: e}
+	e.content = newEntryContent(e, nil)
 	e.scroll = widget.NewScroll(nil)
 	objects := []fyne.CanvasObject{box, border}
 	if e.Wrapping != fyne.TextWrapOff || e.Scroll != widget.ScrollNone {
@@ -1524,7 +1527,7 @@ func (e *Entry) updateMousePointer(p fyne.Position, rightClick bool) {
 	}
 	e.propertyLock.Unlock()
 
-	r := cache.Renderer(e.content)
+	r := e.content.Renderer()
 	if r != nil {
 		r.(*entryContentRenderer).moveCursor()
 	}
@@ -1658,9 +1661,6 @@ type entryRenderer struct {
 	entry   *Entry
 }
 
-func (r *entryRenderer) Destroy() {
-}
-
 func (r *entryRenderer) trailingInset() float32 {
 	th := r.entry.Theme()
 	xInset := float32(0)
@@ -1752,7 +1752,7 @@ func (r *entryRenderer) Layout(size fyne.Size) {
 // This is based on the contained text with a standard amount of padding added.
 // If MultiLine is true then we will reserve space for at leasts 3 lines
 func (r *entryRenderer) MinSize() fyne.Size {
-	if rend := cache.Renderer(r.entry.content); rend != nil {
+	if rend := r.entry.content.Renderer(); rend != nil {
 		rend.(*entryContentRenderer).updateScrollDirections()
 	}
 
@@ -1871,7 +1871,7 @@ func (r *entryRenderer) Refresh() {
 		r.entry.validationStatus.Hide()
 	}
 
-	cache.Renderer(r.entry.content).Refresh()
+	r.entry.content.Renderer().Refresh()
 	canvas.Refresh(r.entry.super())
 }
 
@@ -1895,6 +1895,22 @@ type entryContent struct {
 	scroll *widget.Scroll
 }
 
+func newEntryContent(entry *Entry, scroll *widget.Scroll) *entryContent {
+	e := &entryContent{entry: entry, scroll: scroll}
+	e.ExtendBaseWidget(e)
+	return e
+}
+
+//	func (e *entryContent) ObjectAt(p fyne.Position) fyne.CanvasObject {
+//		op := e.scroll.Position()
+//		if op.X < p.X && op.Y < p.Y {
+//			os := e.scroll.Size()
+//			if op.X+os.Width < p.X && op.Y+os.Height < p.Y {
+//				return e.scroll.ObjectAt(fyne.NewPos(p.X-op.X, p.Y-op.Y))
+//			}
+//		}
+//		return e
+//	}
 func (e *entryContent) CreateRenderer() fyne.WidgetRenderer {
 	e.ExtendBaseWidget(e)
 
@@ -1943,8 +1959,26 @@ type entryContentRenderer struct {
 	content               *entryContent
 }
 
-func (r *entryContentRenderer) Destroy() {
-	r.content.entry.cursorAnim.stop()
+func newEntryContentRenderer(cursor *canvas.Rectangle, selection []fyne.CanvasObject, objects []fyne.CanvasObject, provider, placeholder *RichText, content *entryContent) *entryContentRenderer {
+	r := &entryContentRenderer{
+		cursor,
+		selection,
+		objects,
+		provider,
+		placeholder,
+		content,
+	}
+	// The use of finalizers is not ideal, due to all the caveats of their
+	// use. However, this is exact case where they are appropriate, namely
+	// cleaning up non-memory resources by unregistering an animation from
+	// the driver.
+	//
+	// If we develop better cleanup practices or APIs, we should consider
+	// migrating to those instead.
+	runtime.SetFinalizer(r, func(r *entryContentRenderer) {
+		r.content.entry.cursorAnim.stop()
+	})
+	return r
 }
 
 func (r *entryContentRenderer) Layout(size fyne.Size) {

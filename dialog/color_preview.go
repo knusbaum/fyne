@@ -23,6 +23,10 @@ func newColorPreview(previousColor color.Color) *colorPreview {
 	return p
 }
 
+// func (p *colorPreview) ObjectAt(po fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(p, po)
+// }
+
 // CreateRenderer is a private method to Fyne which links this widget to its renderer.
 func (p *colorPreview) CreateRenderer() fyne.WidgetRenderer {
 	oldC := canvas.NewRectangle(p.previous)

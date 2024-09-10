@@ -78,6 +78,29 @@ func NewGridWrapWithData(data binding.DataList, createItem func() fyne.CanvasObj
 	return gwList
 }
 
+// func (l *GridWrap) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	// TODO: GridWrap should be able to more efficiently find the target
+// 	// object. This should only matter with grids with thousands of objects,
+// 	// which is unlikely.
+// 	// See the Table implementation for reference.
+// 	r := l.Renderer()
+// 	if r == nil {
+// 		return l
+// 	}
+// 	// TODO: is this a good idea? Presumably all the visible objects are
+// 	// members of the renderer. Compare with Container.ObjectAt in /container.go
+// 	for _, o := range r.Objects() {
+// 		op := o.Position()
+// 		if op.X < p.X && op.Y < p.Y {
+// 			os := o.Size()
+// 			if op.X+os.Width < p.X && op.Y+os.Height < p.Y {
+// 				return o.ObjectAt(fyne.NewPos(p.X-op.X, p.Y-op.Y))
+// 			}
+// 		}
+// 	}
+// 	return l
+// }
+
 // CreateRenderer is a private method to Fyne which links this widget to its renderer.
 func (l *GridWrap) CreateRenderer() fyne.WidgetRenderer {
 	l.ExtendBaseWidget(l)
@@ -383,9 +406,6 @@ func (l *gridWrapRenderer) Refresh() {
 	canvas.Refresh(l.list)
 }
 
-func (l *gridWrapRenderer) Destroy() {
-}
-
 func (l *gridWrapRenderer) Objects() []fyne.CanvasObject {
 	return l.objects
 }
@@ -413,6 +433,10 @@ func newGridWrapItem(child fyne.CanvasObject, tapped func()) *gridWrapItem {
 	gw.ExtendBaseWidget(gw)
 	return gw
 }
+
+// func (gw *gridWrapItem) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(gw, p)
+// }
 
 // CreateRenderer is a private method to Fyne which links this widget to its renderer.
 func (gw *gridWrapItem) CreateRenderer() fyne.WidgetRenderer {

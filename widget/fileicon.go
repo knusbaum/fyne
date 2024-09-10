@@ -37,6 +37,10 @@ func NewFileIcon(uri fyne.URI) *FileIcon {
 	return i
 }
 
+// func (i *FileIcon) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return i
+// }
+
 // SetURI changes the URI and makes the icon reflect a different file
 func (i *FileIcon) SetURI(uri fyne.URI) {
 	i.URI = uri

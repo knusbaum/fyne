@@ -13,8 +13,8 @@ import (
 type PopUp struct {
 	BaseWidget
 
-	Content fyne.CanvasObject
-	Canvas  fyne.Canvas
+	Content  fyne.CanvasObject
+	PUCanvas fyne.Canvas
 
 	innerPos     fyne.Position
 	innerSize    fyne.Size
@@ -22,10 +22,14 @@ type PopUp struct {
 	overlayShown bool
 }
 
+// func (p *PopUp) ObjectAt(po fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(p, po)
+// }
+
 // Hide this widget, if it was previously visible
 func (p *PopUp) Hide() {
 	if p.overlayShown {
-		p.Canvas.Overlays().Remove(p)
+		p.PUCanvas.Overlays().Remove(p)
 		p.overlayShown = false
 	}
 	p.BaseWidget.Hide()
@@ -56,7 +60,7 @@ func (p *PopUp) Resize(size fyne.Size) {
 // Show this pop-up as overlay if not already shown.
 func (p *PopUp) Show() {
 	if !p.overlayShown {
-		p.Canvas.Overlays().Add(p)
+		p.PUCanvas.Overlays().Add(p)
 		p.overlayShown = true
 	}
 	p.Refresh()
@@ -136,7 +140,7 @@ func ShowPopUpAtRelativePosition(content fyne.CanvasObject, canvas fyne.Canvas, 
 }
 
 func newPopUp(content fyne.CanvasObject, canvas fyne.Canvas) *PopUp {
-	ret := &PopUp{Content: content, Canvas: canvas, modal: false}
+	ret := &PopUp{Content: content, PUCanvas: canvas, modal: false}
 	ret.ExtendBaseWidget(ret)
 	return ret
 }
@@ -152,7 +156,7 @@ func ShowPopUp(content fyne.CanvasObject, canvas fyne.Canvas) {
 }
 
 func newModalPopUp(content fyne.CanvasObject, canvas fyne.Canvas) *PopUp {
-	p := &PopUp{Content: content, Canvas: canvas, modal: true}
+	p := &PopUp{Content: content, PUCanvas: canvas, modal: true}
 	p.ExtendBaseWidget(p)
 	return p
 }
@@ -195,14 +199,14 @@ func (r *popUpRenderer) Layout(_ fyne.Size) {
 	r.popUp.Content.Resize(innerSize.Subtract(r.padding()))
 
 	innerPos := r.popUp.innerPos
-	if innerPos.X+innerSize.Width > r.popUp.Canvas.Size().Width {
-		innerPos.X = r.popUp.Canvas.Size().Width - innerSize.Width
+	if innerPos.X+innerSize.Width > r.popUp.PUCanvas.Size().Width {
+		innerPos.X = r.popUp.PUCanvas.Size().Width - innerSize.Width
 		if innerPos.X < 0 {
 			innerPos.X = 0 // TODO here we may need a scroller as it's wider than our canvas
 		}
 	}
-	if innerPos.Y+innerSize.Height > r.popUp.Canvas.Size().Height {
-		innerPos.Y = r.popUp.Canvas.Size().Height - innerSize.Height
+	if innerPos.Y+innerSize.Height > r.popUp.PUCanvas.Size().Height {
+		innerPos.Y = r.popUp.PUCanvas.Size().Height - innerSize.Height
 		if innerPos.Y < 0 {
 			innerPos.Y = 0 // TODO here we may need a scroller as it's longer than our canvas
 		}
@@ -228,8 +232,8 @@ func (r *popUpRenderer) Refresh() {
 	if r.background.Size() != r.popUp.innerSize || r.background.Position() != r.popUp.innerPos || shouldRelayout {
 		r.Layout(r.popUp.Size())
 	}
-	if r.popUp.Canvas.Size() != r.popUp.BaseWidget.Size() {
-		r.popUp.BaseWidget.Resize(r.popUp.Canvas.Size())
+	if r.popUp.PUCanvas.Size() != r.popUp.BaseWidget.Size() {
+		r.popUp.BaseWidget.Resize(r.popUp.PUCanvas.Size())
 	}
 	r.popUp.Content.Refresh()
 	r.background.Refresh()
@@ -276,8 +280,8 @@ func (r *modalPopUpRenderer) Refresh() {
 	if r.background.Size() != r.popUp.innerSize || shouldLayout {
 		r.Layout(r.popUp.Size())
 	}
-	if r.popUp.Canvas.Size() != r.popUp.BaseWidget.Size() {
-		r.popUp.BaseWidget.Resize(r.popUp.Canvas.Size())
+	if r.popUp.PUCanvas.Size() != r.popUp.BaseWidget.Size() {
+		r.popUp.BaseWidget.Resize(r.popUp.PUCanvas.Size())
 	}
 	r.popUp.Content.Refresh()
 	r.background.Refresh()

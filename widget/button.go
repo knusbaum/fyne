@@ -88,6 +88,10 @@ func NewButtonWithIcon(label string, icon fyne.Resource, tapped func()) *Button 
 	return button
 }
 
+// func (b *Button) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(b, p)
+// }
+
 // CreateRenderer is a private method to Fyne which links this widget to its renderer
 func (b *Button) CreateRenderer() fyne.WidgetRenderer {
 	b.ExtendBaseWidget(b)

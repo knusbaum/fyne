@@ -117,6 +117,10 @@ func NewTreeWithStrings(data map[string][]string) (t *Tree) {
 	return
 }
 
+// func (t *Tree) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(t, p)
+// }
+
 // CloseAllBranches closes all branches in the tree.
 func (t *Tree) CloseAllBranches() {
 	t.propertyLock.Lock()
@@ -204,7 +208,7 @@ func (t *Tree) RefreshItem(id TreeNodeID) {
 	if t.scroller == nil {
 		return
 	}
-	r := cache.Renderer(t.scroller.Content.(*treeContent))
+	r := t.scroller.Content.(*treeContent).Renderer()
 	if r == nil {
 		return
 	}
@@ -586,6 +590,10 @@ func newTreeContent(tree *Tree) (c *treeContent) {
 	return
 }
 
+// func (c *treeContent) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(c, p)
+// }
+
 func (c *treeContent) CreateRenderer() fyne.WidgetRenderer {
 	return &treeContentRenderer{
 		BaseRenderer: widget.BaseRenderer{},
@@ -850,6 +858,10 @@ type treeNode struct {
 	content  fyne.CanvasObject
 }
 
+// func (n *treeNode) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(n, p)
+// }
+
 func (n *treeNode) Content() fyne.CanvasObject {
 	return n.content
 }
@@ -906,7 +918,7 @@ func (n *treeNode) Tapped(*fyne.PointEvent) {
 }
 
 func (n *treeNode) partialRefresh() {
-	if r := cache.Renderer(n.super()); r != nil {
+	if r := n.super().Renderer(); r != nil {
 		r.(*treeNodeRenderer).partialRefresh()
 	}
 }
@@ -915,7 +927,7 @@ func (n *treeNode) update(uid string, depth int) {
 	n.uid = uid
 	n.depth = depth
 	n.propertyLock.Lock()
-	n.Hidden = false
+	n.Hidden.Store(false)
 	n.propertyLock.Unlock()
 	n.partialRefresh()
 }
@@ -1016,6 +1028,7 @@ func newBranch(tree *Tree, content fyne.CanvasObject) (b *branch) {
 			content:  content,
 		},
 	}
+	b.treeNode.ExtendBaseWidget(b.treeNode)
 	b.ExtendBaseWidget(b)
 
 	if cache.OverrideThemeMatchingScope(b, tree) {
@@ -1077,6 +1090,7 @@ func newLeaf(tree *Tree, content fyne.CanvasObject) (l *leaf) {
 			isBranch: false,
 		},
 	}
+	l.treeNode.ExtendBaseWidget(l.treeNode)
 	l.ExtendBaseWidget(l)
 
 	if cache.OverrideThemeMatchingScope(l, tree) {

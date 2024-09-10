@@ -46,6 +46,10 @@ func NewDocTabs(items ...*TabItem) *DocTabs {
 	return tabs
 }
 
+// func (t *DocTabs) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(t, p)
+// }
+
 // Append adds a new TabItem to the end of the tab bar.
 func (t *DocTabs) Append(item *TabItem) {
 	t.SetItems(append(t.Items, item))
@@ -335,10 +339,16 @@ func (r *docTabsRenderer) buildTabButtons(count int, buttons *fyne.Container) {
 	for i := 0; i < count; i++ {
 		item := r.docTabs.Items[i]
 		if item.button == nil {
-			item.button = &tabButton{
-				onTapped: func() { r.docTabs.Select(item) },
-				onClosed: func() { r.docTabs.close(item) },
-			}
+			// item.button = &tabButton{
+			// 	onTapped: func() { r.docTabs.Select(item) },
+			// 	onClosed: func() { r.docTabs.close(item) },
+			// }
+			item.button = newTabButton(
+				//onTapped
+				func() { r.docTabs.Select(item) },
+				//onClosed
+				func() { r.docTabs.close(item) },
+			)
 		}
 		button := item.button
 		button.icon = item.Icon

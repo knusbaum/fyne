@@ -1,6 +1,8 @@
 package fyne
 
-import "sync"
+import (
+	"sync"
+)
 
 // Declare conformity to CanvasObject
 var _ CanvasObject = (*Container)(nil)
@@ -15,6 +17,40 @@ type Container struct {
 	Layout  Layout // The Layout algorithm for arranging child CanvasObjects
 	lock    sync.Mutex
 	Objects []CanvasObject // The set of CanvasObjects this container holds
+	canvas  Canvas
+}
+
+func (c *Container) ObjectAt(p Position, matches func(CanvasObject) bool) CanvasObject {
+	for _, o := range c.Objects {
+		op := o.Position()
+		if op.X < p.X && op.Y < p.Y {
+			os := o.Size()
+			if op.X+os.Width > p.X && op.Y+os.Height > p.Y {
+				if found := o.ObjectAt(NewPos(p.X-op.X, p.Y-op.Y), matches); found != nil {
+					return found
+				}
+				if matches(o) {
+					return o
+				}
+			}
+		}
+	}
+	if matches(c) {
+		return c
+	}
+	return nil
+}
+
+func (c *Container) SetCanvas(canvas Canvas, setup func()) {
+	isNew := c.canvas != canvas
+	c.canvas = canvas
+	if isNew {
+		setup()
+	}
+}
+
+func (c *Container) Canvas() Canvas {
+	return c.canvas
 }
 
 // NewContainer returns a new Container instance holding the specified CanvasObjects.

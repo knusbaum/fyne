@@ -43,6 +43,10 @@ func NewAppTabs(items ...*TabItem) *AppTabs {
 	return tabs
 }
 
+// func (t *AppTabs) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(t, p)
+// }
+
 // CreateRenderer is a private method to Fyne which links this widget to its renderer
 //
 // Implements: fyne.Widget
@@ -379,9 +383,10 @@ func (r *appTabsRenderer) buildTabButtons(count int) *fyne.Container {
 	for i := 0; i < count; i++ {
 		item := r.appTabs.Items[i]
 		if item.button == nil {
-			item.button = &tabButton{
-				onTapped: func() { r.appTabs.Select(item) },
-			}
+			// item.button = &tabButton{
+			// 	onTapped: func() { r.appTabs.Select(item) },
+			// }
+			item.button = newTabButton(func() { r.appTabs.Select(item) }, nil)
 		}
 		button := item.button
 		button.icon = item.Icon

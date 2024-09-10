@@ -94,51 +94,54 @@ func (c *Canvas) EnsureMinSize() bool {
 	c.RLock()
 	defer c.RUnlock()
 
-	var parentNeedingUpdate *RenderCacheNode
+	//var parentNeedingUpdate *RenderCacheNode
 
 	ensureMinSize := func(node *RenderCacheNode, pos fyne.Position) {
 		obj := node.obj
-		cache.SetCanvasForObject(obj, c.impl, func() {
+		obj.SetCanvas(c.impl, func() {
 			if img, ok := obj.(*canvas.Image); ok {
 				c.RUnlock()
 				img.Refresh() // this may now have a different texScale
 				c.RLock()
 			}
 		})
+		//node.minSize = obj.MinSize()
+		//c.updateLayout(obj)
+		//windowNeedsMinSizeUpdate = true
 
-		if parentNeedingUpdate == node {
-			c.updateLayout(obj)
-			parentNeedingUpdate = nil
-		}
+		// if parentNeedingUpdate == node {
+		// 	c.updateLayout(obj)
+		// 	parentNeedingUpdate = nil
+		// }
 
-		c.RUnlock()
-		if !obj.Visible() {
-			c.RLock()
-			return
-		}
-		minSize := obj.MinSize()
-		c.RLock()
+		// c.RUnlock()
+		// if !obj.Visible() {
+		// 	c.RLock()
+		// 	return
+		// }
+		// minSize := obj.MinSize()
+		// c.RLock()
 
-		minSizeChanged := node.minSize != minSize
-		if minSizeChanged {
-			node.minSize = minSize
-			if node.parent != nil {
-				parentNeedingUpdate = node.parent
-			} else {
-				windowNeedsMinSizeUpdate = true
-				c.RUnlock()
-				size := obj.Size()
-				c.RLock()
-				expectedSize := minSize.Max(size)
-				if expectedSize != size && size != csize {
-					c.RUnlock()
-					obj.Resize(expectedSize)
-					c.RLock()
-				} else {
-					c.updateLayout(obj)
-				}
-			}
-		}
+		// minSizeChanged := node.minSize != minSize
+		// if minSizeChanged {
+		// 	node.minSize = minSize
+		// 	if node.parent != nil {
+		// 		parentNeedingUpdate = node.parent
+		// 	} else {
+		// 		windowNeedsMinSizeUpdate = true
+		// 		c.RUnlock()
+		// 		size := obj.Size()
+		// 		c.RLock()
+		// 		expectedSize := minSize.Max(size)
+		// 		if expectedSize != size && size != csize {
+		// 			c.RUnlock()
+		// 			obj.Resize(expectedSize)
+		// 			c.RLock()
+		// 		} else {
+		// 			c.updateLayout(obj)
+		// 		}
+		// 	}
+		// }
 	}
 	c.WalkTrees(nil, ensureMinSize)
 
@@ -508,6 +511,11 @@ func (c *Canvas) walkTree(
 		return false
 	}
 	ac := func(obj fyne.CanvasObject, pos fyne.Position, _ fyne.CanvasObject) {
+		obj.SetCanvas(c.impl, func() {
+			if img, ok := obj.(*canvas.Image); ok {
+				img.Refresh() // this may now have a different texScale
+			}
+		})
 		node = parent
 		parent = node.parent
 		if prev != nil && prev.parent != parent {
@@ -598,13 +606,14 @@ func (c *Canvas) updateLayout(objToLayout fyne.CanvasObject) {
 			layout := cont.Layout
 			objects := cont.Objects
 			c.RUnlock()
+			defer c.RLock()
 			layout.Layout(objects, cont.Size())
-			c.RLock()
+
 		}
 	case fyne.Widget:
-		renderer := cache.Renderer(cont)
+		renderer := cont.Renderer()
 		c.RUnlock()
+		defer c.RLock()
 		renderer.Layout(cont.Size())
-		c.RLock()
 	}
 }

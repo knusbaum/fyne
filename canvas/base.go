@@ -22,6 +22,7 @@ type baseObject struct {
 	min async.Size // The minimum size this object can be
 
 	propertyLock sync.RWMutex
+	CanvasMixin
 }
 
 // Hide will set this object to not be visible.

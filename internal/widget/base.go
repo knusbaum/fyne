@@ -6,7 +6,6 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/internal/async"
-	"fyne.io/fyne/v2/internal/cache"
 )
 
 // Base provides a helper that handles basic widget behaviours.
@@ -15,6 +14,24 @@ type Base struct {
 	position async.Position
 	size     async.Size
 	impl     atomic.Pointer[fyne.Widget]
+	renderer fyne.WidgetRenderer
+	canvas.CanvasMixin
+}
+
+func (w *Base) ObjectAt(p fyne.Position, matches func(fyne.CanvasObject) bool) fyne.CanvasObject {
+	return fyne.WidgetRendererObjectAt(w.super(), p, matches)
+}
+
+// Renderer returns the renderer for the widget
+func (w *Base) Renderer() fyne.WidgetRenderer {
+	if w.renderer == nil {
+		s := w.super()
+		if s == nil {
+			return nil
+		}
+		w.renderer = s.CreateRenderer()
+	}
+	return w.renderer
 }
 
 // ExtendBaseWidget is used by an extending widget to make use of BaseWidget functionality.
@@ -45,7 +62,7 @@ func (w *Base) Resize(size fyne.Size) {
 	if impl == nil {
 		return
 	}
-	cache.Renderer(impl).Layout(size)
+	w.Renderer().Layout(size)
 }
 
 // Position gets the current position of this widget, relative to its parent.
@@ -63,9 +80,9 @@ func (w *Base) Move(pos fyne.Position) {
 
 // MinSize for the widget - it should never be resized below this value.
 func (w *Base) MinSize() fyne.Size {
-	impl := w.super()
+	//impl := w.super()
 
-	r := cache.Renderer(impl)
+	r := w.Renderer()
 	if r == nil {
 		return fyne.NewSize(0, 0)
 	}
@@ -112,7 +129,7 @@ func (w *Base) Refresh() {
 		return
 	}
 
-	render := cache.Renderer(impl)
+	render := w.Renderer()
 	render.Refresh()
 }
 

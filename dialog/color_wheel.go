@@ -54,6 +54,10 @@ func newColorWheel(onChange func(int, int, int, int)) *colorWheel {
 	return a
 }
 
+// func (a *colorWheel) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(a, p)
+// }
+
 // Cursor returns the cursor type of this widget.
 func (a *colorWheel) Cursor() desktop.Cursor {
 	return desktop.CrosshairCursor

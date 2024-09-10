@@ -1,79 +1,73 @@
 package cache
 
-import (
-	"sync"
+// var renderersLock sync.RWMutex
+// var renderers = map[fyne.Widget]*rendererInfo{}
 
-	"fyne.io/fyne/v2"
-)
+// type isBaseWidget interface {
+// 	ExtendBaseWidget(fyne.Widget)
+// 	super() fyne.Widget
+// }
 
-var renderersLock sync.RWMutex
-var renderers = map[fyne.Widget]*rendererInfo{}
+// // Renderer looks up the render implementation for a widget
+// func Renderer(wid fyne.Widget) fyne.WidgetRenderer {
+// 	if wid == nil {
+// 		return nil
+// 	}
 
-type isBaseWidget interface {
-	ExtendBaseWidget(fyne.Widget)
-	super() fyne.Widget
-}
+// 	if wd, ok := wid.(isBaseWidget); ok {
+// 		if wd.super() != nil {
+// 			wid = wd.super()
+// 		}
+// 	}
 
-// Renderer looks up the render implementation for a widget
-func Renderer(wid fyne.Widget) fyne.WidgetRenderer {
-	if wid == nil {
-		return nil
-	}
+// 	renderersLock.RLock()
+// 	rinfo, ok := renderers[wid]
+// 	renderersLock.RUnlock()
+// 	if !ok {
+// 		rinfo = &rendererInfo{renderer: wid.CreateRenderer()}
+// 		renderersLock.Lock()
+// 		renderers[wid] = rinfo
+// 		renderersLock.Unlock()
+// 	}
 
-	if wd, ok := wid.(isBaseWidget); ok {
-		if wd.super() != nil {
-			wid = wd.super()
-		}
-	}
+// 	if rinfo == nil {
+// 		return nil
+// 	}
 
-	renderersLock.RLock()
-	rinfo, ok := renderers[wid]
-	renderersLock.RUnlock()
-	if !ok {
-		rinfo = &rendererInfo{renderer: wid.CreateRenderer()}
-		renderersLock.Lock()
-		renderers[wid] = rinfo
-		renderersLock.Unlock()
-	}
+// 	rinfo.setAlive()
 
-	if rinfo == nil {
-		return nil
-	}
+// 	return rinfo.renderer
+// }
 
-	rinfo.setAlive()
+// // DestroyRenderer frees a render implementation for a widget.
+// // This is typically for internal use only.
+// func DestroyRenderer(wid fyne.Widget) {
+// 	renderersLock.RLock()
+// 	rinfo, ok := renderers[wid]
+// 	renderersLock.RUnlock()
+// 	if !ok {
+// 		return
+// 	}
+// 	if rinfo != nil {
+// 		rinfo.renderer.Destroy()
+// 	}
+// 	overrides.Delete(wid)
 
-	return rinfo.renderer
-}
+// 	renderersLock.Lock()
+// 	delete(renderers, wid)
+// 	renderersLock.Unlock()
+// }
 
-// DestroyRenderer frees a render implementation for a widget.
-// This is typically for internal use only.
-func DestroyRenderer(wid fyne.Widget) {
-	renderersLock.RLock()
-	rinfo, ok := renderers[wid]
-	renderersLock.RUnlock()
-	if !ok {
-		return
-	}
-	if rinfo != nil {
-		rinfo.renderer.Destroy()
-	}
-	overrides.Delete(wid)
+// // IsRendered returns true of the widget currently has a renderer.
+// // One will be created the first time a widget is shown but may be removed after it is hidden.
+// func IsRendered(wid fyne.Widget) bool {
+// 	renderersLock.RLock()
+// 	_, found := renderers[wid]
+// 	renderersLock.RUnlock()
+// 	return found
+// }
 
-	renderersLock.Lock()
-	delete(renderers, wid)
-	renderersLock.Unlock()
-}
-
-// IsRendered returns true of the widget currently has a renderer.
-// One will be created the first time a widget is shown but may be removed after it is hidden.
-func IsRendered(wid fyne.Widget) bool {
-	renderersLock.RLock()
-	_, found := renderers[wid]
-	renderersLock.RUnlock()
-	return found
-}
-
-type rendererInfo struct {
-	expiringCache
-	renderer fyne.WidgetRenderer
-}
+// type rendererInfo struct {
+// 	expiringCache
+// 	renderer fyne.WidgetRenderer
+// }

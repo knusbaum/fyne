@@ -1,15 +1,15 @@
 package widget
 
 import (
+	"fmt"
 	"math"
 	"strconv"
+	"sync"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/driver/mobile"
-	"fyne.io/fyne/v2/internal/async"
-	"fyne.io/fyne/v2/internal/cache"
 	"fyne.io/fyne/v2/internal/widget"
 	"fyne.io/fyne/v2/theme"
 )
@@ -130,6 +130,10 @@ func NewTableWithHeaders(length func() (rows int, cols int), create func() fyne.
 
 	return t
 }
+
+// func (t *Table) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(t, p)
+// }
 
 // CreateRenderer returns a new renderer for the table.
 //
@@ -256,7 +260,7 @@ func (t *Table) RefreshItem(id TableCellID) {
 	if t.cells == nil {
 		return
 	}
-	r := cache.Renderer(t.cells)
+	r := t.cells.Renderer()
 	if r == nil {
 		return
 	}
@@ -1169,6 +1173,10 @@ func newTableCells(t *Table) *tableCells {
 	return c
 }
 
+// func (c *tableCells) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(c, p)
+// }
+
 func (c *tableCells) CreateRenderer() fyne.WidgetRenderer {
 	th := c.Theme()
 	v := fyne.CurrentApp().Settings().ThemeVariant()
@@ -1195,16 +1203,40 @@ func (c *tableCells) Resize(s fyne.Size) {
 // Declare conformity with WidgetRenderer interface.
 var _ fyne.WidgetRenderer = (*tableCellsRenderer)(nil)
 
+type copool struct {
+	ob []fyne.CanvasObject
+	m  sync.Mutex
+}
+
+func (p *copool) Get() fyne.CanvasObject {
+	p.m.Lock()
+	defer p.m.Unlock()
+	if len(p.ob) == 0 {
+		return nil
+	}
+	ret := p.ob[len(p.ob)-1]
+	p.ob = p.ob[:len(p.ob)-1]
+	return ret
+}
+
+func (p *copool) Put(o fyne.CanvasObject) {
+	p.m.Lock()
+	defer p.m.Unlock()
+	p.ob = append(p.ob, o)
+}
+
 type tableCellsRenderer struct {
 	widget.BaseRenderer
 
 	cells            *tableCells
-	pool, headerPool async.Pool[fyne.CanvasObject]
+	pool, headerPool copool //async.Pool[fyne.CanvasObject]
 	visible, headers map[TableCellID]fyne.CanvasObject
 	hover, marker    *canvas.Rectangle
 	dividers         []fyne.CanvasObject
 
 	headColBG, headRowBG, headRowStickyBG, headColStickyBG *canvas.Rectangle
+
+	mu sync.Mutex
 }
 
 func (r *tableCellsRenderer) Layout(fyne.Size) {
@@ -1418,6 +1450,11 @@ func (r *tableCellsRenderer) refreshForID(toDraw TableCellID) {
 }
 
 func (r *tableCellsRenderer) moveIndicators() {
+	// TODO: This can be called by multiple goroutines, so
+	// we must make it safe. Probably this lock belongs
+	// higher up in the callstack.
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	rows, cols := 0, 0
 	if f := r.cells.t.Length; f != nil {
 		rows, cols = r.cells.t.Length()
@@ -1467,6 +1504,7 @@ func (r *tableCellsRenderer) moveIndicators() {
 		rowDivs = 0
 	}
 
+	fmt.Printf("len(r.dividers): %d, colDivs + rowDivs: %v\n", len(r.dividers), colDivs+rowDivs)
 	if len(r.dividers) < colDivs+rowDivs {
 		for i := len(r.dividers); i < colDivs+rowDivs; i++ {
 			r.dividers = append(r.dividers, NewSeparator())
@@ -1476,6 +1514,7 @@ func (r *tableCellsRenderer) moveIndicators() {
 		r.cells.t.dividerLayer.Content.(*fyne.Container).Objects = append(objs, r.dividers...)
 		r.cells.t.dividerLayer.Content.Refresh()
 	}
+	fmt.Printf("after: len(r.dividers): %d, colDivs + rowDivs: %v\n", len(r.dividers), colDivs+rowDivs)
 
 	size := r.cells.t.size.Load()
 
@@ -1496,6 +1535,7 @@ func (r *tableCellsRenderer) moveIndicators() {
 	for x := offX + r.cells.t.stuckWidth + visibleColWidths[i]; i < maxCol-1 && divs < colDivs; x += visibleColWidths[i] + padding {
 		i++
 
+		//fmt.Printf("len(r.dividers): %v\n", len(r.dividers))
 		xPos := x - r.cells.t.content.Offset.X + dividerOff
 		r.dividers[divs].Resize(fyne.NewSize(separatorThickness, size.Height))
 		r.dividers[divs].Move(fyne.NewPos(xPos, 0))
@@ -1526,9 +1566,10 @@ func (r *tableCellsRenderer) moveIndicators() {
 		divs++
 	}
 
-	for i := divs; i < len(r.dividers); i++ {
-		r.dividers[i].Hide()
-	}
+	r.dividers = r.dividers[divs:]
+	// for i := divs; i < len(r.dividers); i++ {
+	// 	r.dividers[i].Hide()
+	// }
 }
 
 func (r *tableCellsRenderer) moveMarker(marker fyne.CanvasObject, row, col int, offX, offY float32, minCol, minRow int, widths, heights map[int]float32) {
@@ -1729,7 +1770,7 @@ func newClip(t *Table, o fyne.CanvasObject) *clip {
 	c := &clip{t: t}
 	c.Content = o
 	c.Direction = widget.ScrollNone
-
+	c.ExtendBaseWidget(c)
 	return c
 }
 

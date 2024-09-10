@@ -51,6 +51,10 @@ type Icon struct {
 	cachedRes fyne.Resource
 }
 
+// func (i *Icon) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(i, p)
+// }
+
 // SetResource updates the resource rendered in this icon widget
 func (i *Icon) SetResource(res fyne.Resource) {
 	i.Resource = res

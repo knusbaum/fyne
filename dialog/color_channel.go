@@ -35,6 +35,10 @@ func newColorChannel(name string, min, max, value int, onChanged func(int)) *col
 	return c
 }
 
+// func (c *colorChannel) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(c, p)
+// }
+
 // CreateRenderer is a private method to Fyne which links this widget to its renderer
 func (c *colorChannel) CreateRenderer() fyne.WidgetRenderer {
 	label := widget.NewLabelWithStyle(c.name, fyne.TextAlignTrailing, fyne.TextStyle{Bold: true})

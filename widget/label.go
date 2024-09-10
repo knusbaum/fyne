@@ -54,6 +54,10 @@ func NewLabelWithStyle(text string, alignment fyne.TextAlign, style fyne.TextSty
 	return l
 }
 
+// func (l *Label) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(l, p)
+// }
+
 // Bind connects the specified data source to this Label.
 // The current value will be displayed and any changes in the data will cause the widget to update.
 //

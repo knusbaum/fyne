@@ -83,6 +83,10 @@ func NewListWithData(data binding.DataList, createItem func() fyne.CanvasObject,
 	return l
 }
 
+// func (l *List) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(l, p)
+// }
+
 // CreateRenderer is a private method to Fyne which links this widget to its renderer.
 func (l *List) CreateRenderer() fyne.WidgetRenderer {
 	l.ExtendBaseWidget(l)
@@ -513,6 +517,10 @@ func newListItem(child fyne.CanvasObject, tapped func()) *listItem {
 	li.ExtendBaseWidget(li)
 	return li
 }
+
+// func (l *listItem) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(l, p)
+// }
 
 // CreateRenderer is a private method to Fyne which links this widget to its renderer.
 func (li *listItem) CreateRenderer() fyne.WidgetRenderer {

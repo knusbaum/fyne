@@ -19,6 +19,7 @@ type Circle struct {
 	FillColor   color.Color // The circle fill color
 	StrokeColor color.Color // The circle stroke color
 	StrokeWidth float32     // The stroke width of the circle
+	CanvasMixin
 }
 
 // NewCircle returns a new Circle instance
@@ -26,6 +27,13 @@ func NewCircle(color color.Color) *Circle {
 	return &Circle{
 		FillColor: color,
 	}
+}
+
+func (c *Circle) ObjectAt(p fyne.Position, matches func(fyne.CanvasObject) bool) fyne.CanvasObject {
+	if matches(c) {
+		return c
+	}
+	return nil
 }
 
 // Hide will set this circle to not be visible

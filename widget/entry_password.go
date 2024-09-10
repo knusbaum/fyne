@@ -28,6 +28,17 @@ func newPasswordRevealer(e *Entry) *passwordRevealer {
 	return pr
 }
 
+// func (r *passwordRevealer) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	op := r.icon.Position()
+// 	if op.X < p.X && op.Y < p.Y {
+// 		os := r.icon.Size()
+// 		if op.X+os.Width < p.X && op.Y+os.Height < p.Y {
+// 			return r.icon.ObjectAt(fyne.NewPos(p.X-op.X, p.Y-op.Y))
+// 		}
+// 	}
+// 	return r
+// }
+
 func (r *passwordRevealer) CreateRenderer() fyne.WidgetRenderer {
 	return &passwordRevealerRenderer{
 		WidgetRenderer: NewSimpleRenderer(r.icon),

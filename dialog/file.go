@@ -350,7 +350,7 @@ func (f *fileDialog) optionsMenu(position fyne.Position, buttonSize fyne.Size) {
 
 	p := position.Add(buttonSize)
 	pos := fyne.NewPos(p.X-content.MinSize().Width-theme.Padding()*2, p.Y+theme.Padding()*2)
-	widget.ShowPopUpAtPosition(content, f.win.Canvas, pos)
+	widget.ShowPopUpAtPosition(content, f.win.PUCanvas, pos)
 }
 
 func (f *fileDialog) loadFavorites() {
@@ -668,7 +668,7 @@ func showFile(file *FileDialog) *fileDialog {
 	d.setLocation(file.effectiveStartingDir())
 	d.win.Show()
 	if file.save {
-		d.win.Canvas.Focus(d.fileName.(*widget.Entry))
+		d.win.PUCanvas.Focus(d.fileName.(*widget.Entry))
 	}
 	return d
 }

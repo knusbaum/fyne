@@ -299,9 +299,6 @@ type baseTabsRenderer struct {
 	tabs baseTabs
 }
 
-func (r *baseTabsRenderer) Destroy() {
-}
-
 func (r *baseTabsRenderer) applyTheme(t baseTabs) {
 	if r.action != nil {
 		r.action.SetIcon(moreIcon(t))
@@ -513,6 +510,19 @@ type tabButton struct {
 	textAlignment fyne.TextAlign
 }
 
+func newTabButton(onTapped func(), onClosed func()) *tabButton {
+	b := &tabButton{
+		onTapped: onTapped,
+		onClosed: onClosed,
+	}
+	b.ExtendBaseWidget(b)
+	return b
+}
+
+// func (b *tabButton) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(b, p)
+// }
+
 func (b *tabButton) CreateRenderer() fyne.WidgetRenderer {
 	b.ExtendBaseWidget(b)
 	th := b.Theme()
@@ -529,14 +539,24 @@ func (b *tabButton) CreateRenderer() fyne.WidgetRenderer {
 	label := canvas.NewText(b.text, th.Color(theme.ColorNameForeground, v))
 	label.TextStyle.Bold = true
 
-	close := &tabCloseButton{
-		parent: b,
-		onTapped: func() {
+	// close := &tabCloseButton{
+	// 	parent: b,
+	// 	onTapped: func() {
+	// 		if f := b.onClosed; f != nil {
+	// 			f()
+	// 		}
+	// 	},
+	// }
+	close := newTabCloseButton(
+		//parent
+		b,
+		//onTapped
+		func() {
 			if f := b.onClosed; f != nil {
 				f()
 			}
 		},
-	}
+	)
 	close.ExtendBaseWidget(close)
 	close.Hide()
 
@@ -586,9 +606,6 @@ type tabButtonRenderer struct {
 	label      *canvas.Text
 	close      *tabCloseButton
 	objects    []fyne.CanvasObject
-}
-
-func (r *tabButtonRenderer) Destroy() {
 }
 
 func (r *tabButtonRenderer) Layout(size fyne.Size) {
@@ -758,6 +775,19 @@ type tabCloseButton struct {
 	onTapped func()
 }
 
+func newTabCloseButton(parent *tabButton, onTapped func()) *tabCloseButton {
+	b := &tabCloseButton{
+		parent:   parent,
+		onTapped: onTapped,
+	}
+	b.ExtendBaseWidget(b)
+	return b
+}
+
+// func (b *tabCloseButton) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(b, p)
+// }
+
 func (b *tabCloseButton) CreateRenderer() fyne.WidgetRenderer {
 	b.ExtendBaseWidget(b)
 	th := b.Theme()
@@ -805,9 +835,6 @@ type tabCloseButtonRenderer struct {
 	background *canvas.Rectangle
 	icon       *canvas.Image
 	objects    []fyne.CanvasObject
-}
-
-func (r *tabCloseButtonRenderer) Destroy() {
 }
 
 func (r *tabCloseButtonRenderer) Layout(size fyne.Size) {

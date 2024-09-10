@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"fyne.io/fyne/v2/internal/cache"
 	"fyne.io/fyne/v2/internal/painter"
 
 	"fyne.io/fyne/v2"
@@ -80,6 +79,10 @@ type TextGrid struct {
 	ShowWhitespace  bool
 	TabWidth        int // If set to 0 the fyne.DefaultTabWidth is used
 }
+
+// func (t *TextGrid) ObjectAt(p fyne.Position) fyne.CanvasObject {
+// 	return fyne.WidgetRendererObjectAt(t, p)
+// }
 
 // MinSize returns the smallest size this widget can shrink to
 func (t *TextGrid) MinSize() fyne.Size {
@@ -316,7 +319,7 @@ func (t *TextGrid) ensureCells(row, col int) {
 }
 
 func (t *TextGrid) refreshCell(row, col int) {
-	r := cache.Renderer(t).(*textGridRenderer)
+	r := t.Renderer().(*textGridRenderer)
 	r.refreshCell(row, col)
 }
 
@@ -598,9 +601,6 @@ func (t *textGridRenderer) ApplyTheme() {
 
 func (t *textGridRenderer) Objects() []fyne.CanvasObject {
 	return t.objects
-}
-
-func (t *textGridRenderer) Destroy() {
 }
 
 func (t *textGridRenderer) refresh(obj fyne.CanvasObject) {

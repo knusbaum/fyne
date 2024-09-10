@@ -20,14 +20,6 @@ func NewSimpleRenderer(object fyne.CanvasObject) *SimpleRenderer {
 	return &SimpleRenderer{[]fyne.CanvasObject{object}}
 }
 
-// Destroy does nothing in this implementation.
-//
-// Implements: fyne.WidgetRenderer
-//
-// Since: 2.1
-func (r *SimpleRenderer) Destroy() {
-}
-
 // Layout updates the contained object to be the requested size.
 //
 // Implements: fyne.WidgetRenderer
