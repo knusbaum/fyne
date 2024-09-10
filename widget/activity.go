@@ -2,6 +2,7 @@ package widget
 
 import (
 	"image/color"
+	"runtime"
 	"sync/atomic"
 	"time"
 
@@ -60,7 +61,7 @@ func (a *Activity) CreateRenderer() fyne.WidgetRenderer {
 	for i := range dots {
 		dots[i] = canvas.NewCircle(a.Theme().Color(theme.ColorNameForeground, v))
 	}
-	r := &activityRenderer{dots: dots, parent: a}
+	r := newActivityRenderer(dots, a)
 	r.anim = &fyne.Animation{
 		Duration:    time.Second * 2,
 		RepeatCount: fyne.AnimationRepeatForever,
@@ -87,9 +88,12 @@ type activityRenderer struct {
 	wasStarted bool
 }
 
-func (a *activityRenderer) Destroy() {
-	a.parent.started.Store(false)
-	a.stop()
+func newActivityRenderer(dots []fyne.CanvasObject, parent *Activity) *activityRenderer {
+	a := &activityRenderer{dots: dots, parent: parent}
+	runtime.SetFinalizer(a, func(a *activityRenderer) {
+		a.stop()
+	})
+	return a
 }
 
 func (a *activityRenderer) Layout(size fyne.Size) {

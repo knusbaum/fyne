@@ -79,7 +79,7 @@ func overrideWidget(w fyne.Widget, s *overrideScope) {
 	ResetThemeCaches()
 	overrides.Store(w, s)
 
-	r := Renderer(w)
+	r := w.Renderer()
 	if r == nil {
 		return
 	}

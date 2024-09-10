@@ -13,7 +13,6 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/internal/cache"
 	paint "fyne.io/fyne/v2/internal/painter"
 	"fyne.io/fyne/v2/internal/widget"
 	"fyne.io/fyne/v2/layout"
@@ -55,6 +54,7 @@ type RichText struct {
 func NewRichText(segments ...RichTextSegment) *RichText {
 	t := &RichText{Segments: segments}
 	t.Scroll = widget.ScrollNone
+	t.ExtendBaseWidget(t)
 	t.updateRowBounds()
 	return t
 }
@@ -64,10 +64,12 @@ func NewRichText(segments ...RichTextSegment) *RichText {
 //
 // Since: 2.1
 func NewRichTextWithText(text string) *RichText {
-	return NewRichText(&TextSegment{
+	t := NewRichText(&TextSegment{
 		Style: RichTextStyleInline,
 		Text:  text,
 	})
+	t.ExtendBaseWidget(t)
+	return t
 }
 
 // CreateRenderer is a private method to Fyne which links this widget to its renderer
@@ -77,12 +79,9 @@ func (t *RichText) CreateRenderer() fyne.WidgetRenderer {
 		t.scr = widget.NewScroll(&fyne.Container{Layout: layout.NewStackLayout(), Objects: []fyne.CanvasObject{
 			t.prop, &fyne.Container{}}})
 	}
-
-	t.ExtendBaseWidget(t)
 	r := &textRenderer{obj: t}
 
 	t.updateRowBounds() // set up the initial text layout etc
-	r.Refresh()
 	return r
 }
 
@@ -131,7 +130,7 @@ func (t *RichText) Resize(size fyne.Size) {
 
 	if skipResize {
 		if len(segments) < 2 { // we can simplify :)
-			cache.Renderer(t).Layout(size)
+			t.Renderer().Layout(size)
 			return
 		}
 	}

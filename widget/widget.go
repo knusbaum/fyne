@@ -22,6 +22,19 @@ type BaseWidget struct {
 	impl         atomic.Pointer[fyne.Widget]
 	propertyLock sync.RWMutex
 	themeCache   fyne.Theme
+	renderer     fyne.WidgetRenderer
+}
+
+func (w *BaseWidget) Renderer() fyne.WidgetRenderer {
+	if w.renderer == nil {
+		impl := w.super()
+		if impl == nil {
+			panic("Widget failed to call ExtendBaseWidget")
+			return nil
+		}
+		w.renderer = impl.CreateRenderer()
+	}
+	return w.renderer
 }
 
 // ExtendBaseWidget is used by an extending widget to make use of BaseWidget functionality.
@@ -52,7 +65,7 @@ func (w *BaseWidget) Resize(size fyne.Size) {
 	if impl == nil {
 		return
 	}
-	cache.Renderer(impl).Layout(size)
+	w.Renderer().Layout(size)
 }
 
 // Position gets the current position of this widget, relative to its parent.
@@ -69,9 +82,7 @@ func (w *BaseWidget) Move(pos fyne.Position) {
 
 // MinSize for the widget - it should never be resized below this value.
 func (w *BaseWidget) MinSize() fyne.Size {
-	impl := w.super()
-
-	r := cache.Renderer(impl)
+	r := w.Renderer()
 	if r == nil {
 		return fyne.Size{}
 	}
@@ -124,17 +135,15 @@ func (w *BaseWidget) Hide() {
 
 // Refresh causes this widget to be redrawn in its current state
 func (w *BaseWidget) Refresh() {
-	impl := w.super()
-	if impl == nil {
-		return
-	}
-
 	w.propertyLock.Lock()
 	w.themeCache = nil
 	w.propertyLock.Unlock()
 
-	render := cache.Renderer(impl)
-	render.Refresh()
+	renderer := w.Renderer()
+	if renderer == nil {
+		return
+	}
+	renderer.Refresh()
 }
 
 // Theme returns a cached Theme instance for this widget (or its extending widget).

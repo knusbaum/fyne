@@ -87,9 +87,6 @@ type splitContainerRenderer struct {
 	objects []fyne.CanvasObject
 }
 
-func (r *splitContainerRenderer) Destroy() {
-}
-
 func (r *splitContainerRenderer) Layout(size fyne.Size) {
 	var dividerPos, leadingPos, trailingPos fyne.Position
 	var dividerSize, leadingSize, trailingSize fyne.Size
@@ -311,9 +308,6 @@ type dividerRenderer struct {
 	background *canvas.Rectangle
 	foreground *canvas.Rectangle
 	objects    []fyne.CanvasObject
-}
-
-func (r *dividerRenderer) Destroy() {
 }
 
 func (r *dividerRenderer) Layout(size fyne.Size) {

@@ -35,14 +35,10 @@ func NewConfirm(title, message string, callback func(bool), parent fyne.Window) 
 	d := newTextDialog(title, message, theme.QuestionIcon(), parent)
 	d.callback = callback
 
-	d.dismiss = &widget.Button{Text: lang.L("No"), Icon: theme.CancelIcon(),
-		OnTapped: d.Hide,
-	}
-	confirm := &widget.Button{Text: lang.L("Yes"), Icon: theme.ConfirmIcon(), Importance: widget.HighImportance,
-		OnTapped: func() {
-			d.hideWithResponse(true)
-		},
-	}
+	d.dismiss = widget.NewButtonWithIcon(lang.L("No"), theme.CancelIcon(), d.Hide)
+	confirm := widget.NewButtonWithIconImportance("", theme.ConfirmIcon(), widget.HighImportance, func() {
+		d.hideWithResponse(true)
+	})
 	d.create(container.NewGridWithColumns(2, d.dismiss, confirm))
 
 	return &ConfirmDialog{dialog: d, confirm: confirm}

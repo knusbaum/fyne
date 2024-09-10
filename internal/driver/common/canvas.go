@@ -602,7 +602,7 @@ func (c *Canvas) updateLayout(objToLayout fyne.CanvasObject) {
 			c.RLock()
 		}
 	case fyne.Widget:
-		renderer := cache.Renderer(cont)
+		renderer := cont.Renderer()
 		c.RUnlock()
 		renderer.Layout(cont.Size())
 		c.RLock()

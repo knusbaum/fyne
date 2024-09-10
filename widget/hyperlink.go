@@ -306,9 +306,6 @@ type hyperlinkRenderer struct {
 	objects []fyne.CanvasObject
 }
 
-func (r *hyperlinkRenderer) Destroy() {
-}
-
 func (r *hyperlinkRenderer) Layout(s fyne.Size) {
 	th := r.hl.Theme()
 	r.hl.propertyLock.RLock()

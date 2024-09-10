@@ -30,9 +30,6 @@ type menuButtonRenderer struct {
 	bg  *fynecanvas.Rectangle
 }
 
-func (m *menuButtonRenderer) Destroy() {
-}
-
 func (m *menuButtonRenderer) Layout(size fyne.Size) {
 	m.bg.Move(fyne.NewPos(theme.Padding()/2, theme.Padding()/2))
 	m.bg.Resize(size.Subtract(fyne.NewSize(theme.Padding(), theme.Padding())))

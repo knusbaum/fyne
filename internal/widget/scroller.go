@@ -4,7 +4,6 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/internal/cache"
 	"fyne.io/fyne/v2/theme"
 )
 
@@ -372,7 +371,7 @@ func (r *scrollContainerRenderer) updatePosition() {
 	if r.scroll.Direction == ScrollVerticalOnly || r.scroll.Direction == ScrollBoth {
 		r.handleAreaVisibility(contentSize.Height, scrollSize.Height, r.vertArea)
 		r.handleShadowVisibility(r.scroll.Offset.Y, contentSize.Height, scrollSize.Height, r.topShadow, r.bottomShadow)
-		cache.Renderer(r.vertArea).Layout(scrollSize)
+		r.vertArea.Renderer().Layout(scrollSize)
 	} else {
 		r.vertArea.Hide()
 		r.topShadow.Hide()
@@ -381,7 +380,7 @@ func (r *scrollContainerRenderer) updatePosition() {
 	if r.scroll.Direction == ScrollHorizontalOnly || r.scroll.Direction == ScrollBoth {
 		r.handleAreaVisibility(contentSize.Width, scrollSize.Width, r.horizArea)
 		r.handleShadowVisibility(r.scroll.Offset.X, contentSize.Width, scrollSize.Width, r.leftShadow, r.rightShadow)
-		cache.Renderer(r.horizArea).Layout(scrollSize)
+		r.horizArea.Renderer().Layout(scrollSize)
 	} else {
 		r.horizArea.Hide()
 		r.leftShadow.Hide()
@@ -549,7 +548,6 @@ func computeOffset(start, delta, outerWidth, innerWidth float32) float32 {
 // Note that this may cause the MinSize to be smaller than that of the passed object.
 func NewScroll(content fyne.CanvasObject) *Scroll {
 	s := newScrollContainerWithDirection(ScrollBoth, content)
-	s.ExtendBaseWidget(s)
 	return s
 }
 
@@ -557,7 +555,6 @@ func NewScroll(content fyne.CanvasObject) *Scroll {
 // Note that this may cause the MinSize.Width to be smaller than that of the passed object.
 func NewHScroll(content fyne.CanvasObject) *Scroll {
 	s := newScrollContainerWithDirection(ScrollHorizontalOnly, content)
-	s.ExtendBaseWidget(s)
 	return s
 }
 
@@ -565,7 +562,6 @@ func NewHScroll(content fyne.CanvasObject) *Scroll {
 // Note that this may cause the MinSize.Height to be smaller than that of the passed object.
 func NewVScroll(content fyne.CanvasObject) *Scroll {
 	s := newScrollContainerWithDirection(ScrollVerticalOnly, content)
-	s.ExtendBaseWidget(s)
 	return s
 }
 

@@ -249,7 +249,7 @@ func (r *accordionRenderer) updateObjects() {
 			h = r.headers[i]
 			h.Show()
 		} else {
-			h = &Button{}
+			h = NewButton("", nil)
 			r.headers = append(r.headers, h)
 			hs++
 		}

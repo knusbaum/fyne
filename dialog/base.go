@@ -171,9 +171,6 @@ type themedBackgroundRenderer struct {
 	objects []fyne.CanvasObject
 }
 
-func (renderer *themedBackgroundRenderer) Destroy() {
-}
-
 func (renderer *themedBackgroundRenderer) Layout(size fyne.Size) {
 	renderer.rect.Resize(size)
 }

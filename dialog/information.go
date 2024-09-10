@@ -13,10 +13,7 @@ import (
 
 func createInformationDialog(title, message string, icon fyne.Resource, parent fyne.Window) Dialog {
 	d := newTextDialog(title, message, icon, parent)
-	d.dismiss = &widget.Button{
-		Text:     lang.L("OK"),
-		OnTapped: d.Hide,
-	}
+	d.dismiss = widget.NewButton(lang.L("OK"), d.Hide)
 	d.create(container.NewGridWithColumns(1, d.dismiss))
 	return d
 }

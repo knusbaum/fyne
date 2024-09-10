@@ -9,7 +9,6 @@ import (
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/driver/mobile"
 	"fyne.io/fyne/v2/internal/async"
-	"fyne.io/fyne/v2/internal/cache"
 	"fyne.io/fyne/v2/internal/widget"
 	"fyne.io/fyne/v2/theme"
 )
@@ -256,7 +255,7 @@ func (t *Table) RefreshItem(id TableCellID) {
 	if t.cells == nil {
 		return
 	}
-	r := cache.Renderer(t.cells)
+	r := t.cells.Renderer()
 	if r == nil {
 		return
 	}
@@ -1729,6 +1728,7 @@ func newClip(t *Table, o fyne.CanvasObject) *clip {
 	c := &clip{t: t}
 	c.Content = o
 	c.Direction = widget.ScrollNone
+	c.ExtendBaseWidget(c)
 
 	return c
 }

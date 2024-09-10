@@ -302,8 +302,6 @@ func (s *selectRenderer) Objects() []fyne.CanvasObject {
 	return s.objects
 }
 
-func (s *selectRenderer) Destroy() {}
-
 // Layout the components of the button widget
 func (s *selectRenderer) Layout(size fyne.Size) {
 	th := s.combo.Theme()

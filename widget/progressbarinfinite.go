@@ -1,6 +1,7 @@
 package widget
 
 import (
+	"runtime"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -22,6 +23,18 @@ type infProgressRenderer struct {
 	animation       fyne.Animation
 	wasRunning      bool
 	progress        *ProgressBarInfinite
+}
+
+func newInfProgressRenderer(background, bar canvas.Rectangle, progress *ProgressBarInfinite) *infProgressRenderer {
+	p := &infProgressRenderer{
+		background: background,
+		bar:        bar,
+		progress:   progress,
+	}
+	runtime.SetFinalizer(p, func(p *infProgressRenderer) {
+		p.stop()
+	})
+	return p
 }
 
 // MinSize calculates the minimum size of a progress bar.
@@ -111,14 +124,6 @@ func (p *infProgressRenderer) stop() {
 	p.animation.Stop()
 }
 
-func (p *infProgressRenderer) Destroy() {
-	p.progress.propertyLock.Lock()
-	p.progress.running = false
-	p.progress.propertyLock.Unlock()
-
-	p.stop()
-}
-
 // ProgressBarInfinite widget creates a horizontal panel that indicates waiting indefinitely
 // An infinite progress bar loops 0% -> 100% repeatedly until Stop() is called
 type ProgressBarInfinite struct {
@@ -194,17 +199,20 @@ func (p *ProgressBarInfinite) CreateRenderer() fyne.WidgetRenderer {
 	primaryColor := th.Color(theme.ColorNamePrimary, v)
 	cornerRadius := th.Size(theme.SizeNameInputRadius)
 
-	render := &infProgressRenderer{
-		background: canvas.Rectangle{
+	render := newInfProgressRenderer(
+		// background
+		canvas.Rectangle{
 			FillColor:    progressBlendColor(primaryColor),
 			CornerRadius: cornerRadius,
 		},
-		bar: canvas.Rectangle{
+		// bar
+		canvas.Rectangle{
 			FillColor:    primaryColor,
 			CornerRadius: cornerRadius,
 		},
-		progress: p,
-	}
+		// progress
+		p,
+	)
 
 	render.SetObjects([]fyne.CanvasObject{&render.background, &render.bar})
 

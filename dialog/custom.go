@@ -22,7 +22,7 @@ type CustomDialog struct {
 func NewCustom(title, dismiss string, content fyne.CanvasObject, parent fyne.Window) *CustomDialog {
 	d := &dialog{content: content, title: title, parent: parent}
 
-	d.dismiss = &widget.Button{Text: dismiss, OnTapped: d.Hide}
+	d.dismiss = widget.NewButton(dismiss, d.Hide)
 	d.create(container.NewGridWithColumns(1, d.dismiss))
 
 	return &CustomDialog{dialog: d}
@@ -72,14 +72,15 @@ func NewCustomConfirm(title, confirm, dismiss string, content fyne.CanvasObject,
 	callback func(bool), parent fyne.Window) *ConfirmDialog {
 	d := &dialog{content: content, title: title, parent: parent, callback: callback}
 
-	d.dismiss = &widget.Button{Text: dismiss, Icon: theme.CancelIcon(),
-		OnTapped: d.Hide,
-	}
-	ok := &widget.Button{Text: confirm, Icon: theme.ConfirmIcon(), Importance: widget.HighImportance,
-		OnTapped: func() {
+	d.dismiss = widget.NewButtonWithIcon(dismiss, theme.CancelIcon(), d.Hide)
+	ok := widget.NewButtonWithIconImportance(
+		confirm,
+		theme.ConfirmIcon(),
+		widget.HighImportance,
+		func() {
 			d.hideWithResponse(true)
 		},
-	}
+	)
 	d.create(container.NewGridWithColumns(2, d.dismiss, ok))
 
 	return &ConfirmDialog{dialog: d, confirm: ok}

@@ -383,9 +383,6 @@ func (l *gridWrapRenderer) Refresh() {
 	canvas.Refresh(l.list)
 }
 
-func (l *gridWrapRenderer) Destroy() {
-}
-
 func (l *gridWrapRenderer) Objects() []fyne.CanvasObject {
 	return l.objects
 }

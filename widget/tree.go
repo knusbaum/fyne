@@ -204,7 +204,7 @@ func (t *Tree) RefreshItem(id TreeNodeID) {
 	if t.scroller == nil {
 		return
 	}
-	r := cache.Renderer(t.scroller.Content.(*treeContent))
+	r := t.scroller.Content.(*treeContent).Renderer()
 	if r == nil {
 		return
 	}
@@ -906,7 +906,7 @@ func (n *treeNode) Tapped(*fyne.PointEvent) {
 }
 
 func (n *treeNode) partialRefresh() {
-	if r := cache.Renderer(n.super()); r != nil {
+	if r := n.super().Renderer(); r != nil {
 		r.(*treeNodeRenderer).partialRefresh()
 	}
 }

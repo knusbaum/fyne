@@ -44,32 +44,32 @@ func (w *InnerWindow) Close() {
 func (w *InnerWindow) CreateRenderer() fyne.WidgetRenderer {
 	w.ExtendBaseWidget(w)
 
-	min := &widget.Button{Icon: theme.WindowMinimizeIcon(), Importance: widget.LowImportance, OnTapped: w.OnMinimized}
+	min := widget.NewButtonWithIconImportance("", theme.WindowMinimizeIcon(), widget.LowImportance, w.OnMinimized)
 	if w.OnMinimized == nil {
 		min.Disable()
 	}
-	max := &widget.Button{Icon: theme.WindowMaximizeIcon(), Importance: widget.LowImportance, OnTapped: w.OnMaximized}
+	max := widget.NewButtonWithIconImportance("", theme.WindowMaximizeIcon(), widget.LowImportance, w.OnMaximized)
 	if w.OnMaximized == nil {
 		max.Disable()
 	}
 
 	buttons := NewHBox(
-		&widget.Button{Icon: theme.WindowCloseIcon(), Importance: widget.DangerImportance, OnTapped: func() {
+		widget.NewButtonWithIconImportance("", theme.WindowCloseIcon(), widget.DangerImportance, func() {
 			if f := w.CloseIntercept; f != nil {
 				f()
 			} else {
 				w.Close()
 			}
-		}},
+		}),
 		min, max)
 
 	var icon fyne.CanvasObject
 	if w.Icon != nil {
-		icon = &widget.Button{Icon: w.Icon, Importance: widget.LowImportance, OnTapped: func() {
+		icon = widget.NewButtonWithIconImportance("", w.Icon, widget.LowImportance, func() {
 			if f := w.OnTappedIcon; f != nil {
 				f()
 			}
-		}}
+		})
 		if w.OnTappedIcon == nil {
 			icon.(*widget.Button).Disable()
 		}

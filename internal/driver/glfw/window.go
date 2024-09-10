@@ -16,7 +16,6 @@ import (
 	"fyne.io/fyne/v2/internal/build"
 	"fyne.io/fyne/v2/internal/cache"
 	"fyne.io/fyne/v2/internal/driver"
-	"fyne.io/fyne/v2/internal/driver/common"
 	"fyne.io/fyne/v2/internal/scale"
 )
 
@@ -221,12 +220,6 @@ func (w *window) Close() {
 		w.viewport.SetShouldClose(true)
 
 		cache.RangeTexturesFor(w.canvas, w.canvas.Painter().Free)
-	})
-
-	w.canvas.WalkTrees(nil, func(node *common.RenderCacheNode, _ fyne.Position) {
-		if wid, ok := node.Obj().(fyne.Widget); ok {
-			cache.DestroyRenderer(wid)
-		}
 	})
 }
 

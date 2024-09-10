@@ -168,7 +168,7 @@ func (f *fileDialog) makeUI() fyne.CanvasObject {
 	}
 
 	// icon of button is set in subsequent setView() call
-	f.toggleViewButton = widget.NewButtonWithIcon("", nil, func() {
+	f.toggleViewButton = widget.NewButton("", func() {
 		if f.view == GridView {
 			f.setView(ListView)
 		} else {

@@ -126,9 +126,6 @@ type themedBoxRenderer struct {
 	objects []fyne.CanvasObject
 }
 
-func (r *themedBoxRenderer) Destroy() {
-}
-
 func (r *themedBoxRenderer) Layout(size fyne.Size) {
 	r.bg.Resize(size)
 }

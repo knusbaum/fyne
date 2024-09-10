@@ -4,7 +4,6 @@ import (
 	"math"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/internal/cache"
 )
 
 // AbsolutePositionForObject returns the absolute position of an object in a set of object trees.
@@ -157,8 +156,9 @@ func walkObjectTree(
 	case *fyne.Container:
 		children = co.Objects
 	case fyne.Widget:
-		if cache.IsRendered(co) || requireVisible {
-			children = cache.Renderer(co).Objects()
+		r := co.Renderer()
+		if r != nil {
+			children = r.Objects()
 		}
 	}
 

@@ -76,12 +76,25 @@ func NewButton(label string, tapped func()) *Button {
 	return button
 }
 
-// NewButtonWithIcon creates a new button widget with the specified label, themed icon and tap handler
+// NewButtonWithIcon creates a new button widget with the specified themed icon and tap handler
 func NewButtonWithIcon(label string, icon fyne.Resource, tapped func()) *Button {
 	button := &Button{
 		Text:     label,
 		Icon:     icon,
 		OnTapped: tapped,
+	}
+
+	button.ExtendBaseWidget(button)
+	return button
+}
+
+// NewButtonWithIconImportance creates a new button widget with the specified themed icon, importance and tap handler
+func NewButtonWithIconImportance(label string, icon fyne.Resource, importance Importance, tapped func()) *Button {
+	button := &Button{
+		Text:       label,
+		Icon:       icon,
+		Importance: importance,
+		OnTapped:   tapped,
 	}
 
 	button.ExtendBaseWidget(button)

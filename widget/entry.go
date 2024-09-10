@@ -13,7 +13,6 @@ import (
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/driver/mobile"
-	"fyne.io/fyne/v2/internal/cache"
 	"fyne.io/fyne/v2/internal/widget"
 	"fyne.io/fyne/v2/lang"
 	"fyne.io/fyne/v2/theme"
@@ -70,8 +69,8 @@ type Entry struct {
 
 	dirty       bool
 	focused     bool
-	text        RichText
-	placeholder RichText
+	text        *RichText
+	placeholder *RichText
 	content     *entryContent
 	scroll      *widget.Scroll
 
@@ -110,7 +109,11 @@ type Entry struct {
 
 // NewEntry creates a new single line entry widget.
 func NewEntry() *Entry {
-	e := &Entry{Wrapping: fyne.TextWrap(fyne.TextTruncateClip)}
+	e := &Entry{
+		Wrapping:    fyne.TextWrap(fyne.TextTruncateClip),
+		text:        NewRichText(),
+		placeholder: NewRichText(),
+	}
 	e.ExtendBaseWidget(e)
 	return e
 }
@@ -127,14 +130,24 @@ func NewEntryWithData(data binding.String) *Entry {
 
 // NewMultiLineEntry creates a new entry that allows multiple lines
 func NewMultiLineEntry() *Entry {
-	e := &Entry{MultiLine: true, Wrapping: fyne.TextWrap(fyne.TextTruncateClip)}
+	e := &Entry{
+		MultiLine:   true,
+		Wrapping:    fyne.TextWrap(fyne.TextTruncateClip),
+		text:        NewRichText(),
+		placeholder: NewRichText(),
+	}
 	e.ExtendBaseWidget(e)
 	return e
 }
 
 // NewPasswordEntry creates a new entry password widget
 func NewPasswordEntry() *Entry {
-	e := &Entry{Password: true, Wrapping: fyne.TextWrap(fyne.TextTruncateClip)}
+	e := &Entry{
+		Password:    true,
+		Wrapping:    fyne.TextWrap(fyne.TextTruncateClip),
+		text:        NewRichText(),
+		placeholder: NewRichText(),
+	}
 	e.ExtendBaseWidget(e)
 	e.ActionItem = newPasswordRevealer(e)
 	return e
@@ -185,7 +198,7 @@ func (e *Entry) CreateRenderer() fyne.WidgetRenderer {
 	cursor.Hide()
 
 	e.cursorAnim = newEntryCursorAnimation(cursor)
-	e.content = &entryContent{entry: e}
+	e.content = newEntryContent(e)
 	e.scroll = widget.NewScroll(nil)
 	objects := []fyne.CanvasObject{box, border}
 	if e.Wrapping != fyne.TextWrapOff || e.Scroll != widget.ScrollNone {
@@ -1132,7 +1145,7 @@ func (e *Entry) pasteFromClipboard(clipboard fyne.Clipboard) {
 // placeholderProvider returns the placeholder text handler for this entry
 func (e *Entry) placeholderProvider() *RichText {
 	if len(e.placeholder.Segments) > 0 {
-		return &e.placeholder
+		return e.placeholder
 	}
 
 	e.placeholder.Scroll = widget.ScrollNone
@@ -1149,7 +1162,7 @@ func (e *Entry) placeholderProvider() *RichText {
 		},
 	}
 
-	return &e.placeholder
+	return e.placeholder
 }
 
 func (e *Entry) registerShortcut() {
@@ -1441,7 +1454,7 @@ func (e *Entry) syncSegments() {
 // textProvider returns the text handler for this entry
 func (e *Entry) textProvider() *RichText {
 	if len(e.text.Segments) > 0 {
-		return &e.text
+		return e.text
 	}
 
 	if e.Text != "" {
@@ -1451,7 +1464,7 @@ func (e *Entry) textProvider() *RichText {
 	e.text.Scroll = widget.ScrollNone
 	e.text.inset = fyne.NewSize(0, e.themeWithLock().Size(theme.SizeNameInputBorder))
 	e.text.Segments = []RichTextSegment{&TextSegment{Style: RichTextStyleInline, Text: e.Text}}
-	return &e.text
+	return e.text
 }
 
 // textWrap calculates the wrapping that we should apply.
@@ -1524,7 +1537,7 @@ func (e *Entry) updateMousePointer(p fyne.Position, rightClick bool) {
 	}
 	e.propertyLock.Unlock()
 
-	r := cache.Renderer(e.content)
+	r := e.content.Renderer()
 	if r != nil {
 		r.(*entryContentRenderer).moveCursor()
 	}
@@ -1658,9 +1671,6 @@ type entryRenderer struct {
 	entry   *Entry
 }
 
-func (r *entryRenderer) Destroy() {
-}
-
 func (r *entryRenderer) trailingInset() float32 {
 	th := r.entry.Theme()
 	xInset := float32(0)
@@ -1752,7 +1762,7 @@ func (r *entryRenderer) Layout(size fyne.Size) {
 // This is based on the contained text with a standard amount of padding added.
 // If MultiLine is true then we will reserve space for at leasts 3 lines
 func (r *entryRenderer) MinSize() fyne.Size {
-	if rend := cache.Renderer(r.entry.content); rend != nil {
+	if rend := r.entry.content.Renderer(); rend != nil {
 		rend.(*entryContentRenderer).updateScrollDirections()
 	}
 
@@ -1871,7 +1881,7 @@ func (r *entryRenderer) Refresh() {
 		r.entry.validationStatus.Hide()
 	}
 
-	cache.Renderer(r.entry.content).Refresh()
+	r.entry.content.Renderer().Refresh()
 	canvas.Refresh(r.entry.super())
 }
 
@@ -1895,6 +1905,14 @@ type entryContent struct {
 	scroll *widget.Scroll
 }
 
+func newEntryContent(entry *Entry) *entryContent {
+	e := &entryContent{
+		entry: entry,
+	}
+	e.ExtendBaseWidget(e)
+	return e
+}
+
 func (e *entryContent) CreateRenderer() fyne.WidgetRenderer {
 	e.ExtendBaseWidget(e)
 
@@ -1907,8 +1925,8 @@ func (e *entryContent) CreateRenderer() fyne.WidgetRenderer {
 	}
 	objects := []fyne.CanvasObject{placeholder, provider, e.entry.cursorAnim.cursor}
 
-	r := &entryContentRenderer{e.entry.cursorAnim.cursor, []fyne.CanvasObject{}, objects,
-		provider, placeholder, e}
+	r := newEntryContentRenderer(e.entry.cursorAnim.cursor, []fyne.CanvasObject{}, objects,
+		provider, placeholder, e)
 	r.updateScrollDirections()
 	r.Layout(e.size.Load())
 	return r
@@ -1943,8 +1961,19 @@ type entryContentRenderer struct {
 	content               *entryContent
 }
 
-func (r *entryContentRenderer) Destroy() {
-	r.content.entry.cursorAnim.stop()
+func newEntryContentRenderer(cursor *canvas.Rectangle, selection, objects []fyne.CanvasObject, provider, placeholder *RichText, content *entryContent) *entryContentRenderer {
+	r := &entryContentRenderer{
+		cursor,
+		selection,
+		objects,
+		provider,
+		placeholder,
+		content,
+	}
+	runtime.SetFinalizer(r, func(r *entryContentRenderer) {
+		r.content.entry.cursorAnim.stop()
+	})
+	return r
 }
 
 func (r *entryContentRenderer) Layout(size fyne.Size) {

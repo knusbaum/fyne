@@ -106,9 +106,8 @@ func (p *ColorPickerDialog) updateUI() {
 	if w := p.win; w != nil {
 		w.Hide()
 	}
-	p.dialog.dismiss = &widget.Button{Text: lang.L("Cancel"), Icon: theme.CancelIcon(),
-		OnTapped: p.dialog.Hide,
-	}
+	p.dialog.dismiss = widget.NewButtonWithIcon(lang.L("Cancel"), theme.CancelIcon(), p.dialog.Hide)
+
 	if p.Advanced {
 		p.picker = newColorAdvancedPicker(p.color, func(c color.Color) {
 			p.color = c
@@ -130,11 +129,9 @@ func (p *ColorPickerDialog) updateUI() {
 			p.advanced,
 		)
 
-		confirm := &widget.Button{Text: lang.L("Confirm"), Icon: theme.ConfirmIcon(), Importance: widget.HighImportance,
-			OnTapped: func() {
-				p.selectColor(p.color)
-			},
-		}
+		confirm := widget.NewButtonWithIconImportance(lang.L("Confirm"), theme.ConfirmIcon(), widget.HighImportance, func() {
+			p.selectColor(p.color)
+		})
 		p.dialog.create(container.NewGridWithColumns(2, p.dialog.dismiss, confirm))
 	} else {
 		p.dialog.content = container.NewVBox(p.createSimplePickers()...)

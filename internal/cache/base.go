@@ -47,8 +47,6 @@ func Clean(canvasRefreshed bool) {
 	destroyExpiredSvgs(now)
 	destroyExpiredFontMetrics(now)
 	if canvasRefreshed {
-		// Destroy renderers on canvas refresh to avoid flickering screen.
-		destroyExpiredRenderers(now)
 		// canvases cache should be invalidated only on canvas refresh, otherwise there wouldn't
 		// be a way to recover them later
 		destroyExpiredCanvases(now)
@@ -77,22 +75,6 @@ func CleanCanvas(canvas fyne.Canvas) {
 		delete(canvases, dobj)
 	}
 	canvasesLock.Unlock()
-
-	renderersLock.Lock()
-	for _, dobj := range deletingObjs {
-		wid, ok := dobj.(fyne.Widget)
-		if !ok {
-			continue
-		}
-		rinfo, ok := renderers[wid]
-		if !ok {
-			continue
-		}
-		rinfo.renderer.Destroy()
-		overrides.Delete(wid)
-		delete(renderers, wid)
-	}
-	renderersLock.Unlock()
 }
 
 // CleanCanvases runs cache clean tasks for canvases that are being refreshed. This is called on paint events.
@@ -129,21 +111,6 @@ func CleanCanvases(refreshingCanvases []fyne.Canvas) {
 	}
 	canvasesLock.Unlock()
 
-	renderersLock.Lock()
-	for _, dobj := range deletingObjs {
-		wid, ok := dobj.(fyne.Widget)
-		if !ok {
-			continue
-		}
-		rinfo, ok := renderers[wid]
-		if !ok || !rinfo.isExpired(now) {
-			continue
-		}
-		rinfo.renderer.Destroy()
-		overrides.Delete(wid)
-		delete(renderers, wid)
-	}
-	renderersLock.Unlock()
 	lastClean = timeNow()
 }
 
@@ -176,29 +143,6 @@ func destroyExpiredCanvases(now time.Time) {
 			expiredObjects[i] = nil
 		}
 		canvasesLock.Unlock()
-	}
-}
-
-// destroyExpiredRenderers deletes the renderer from the cache and calls
-// renderer.Destroy()
-func destroyExpiredRenderers(now time.Time) {
-	expiredObjects = expiredObjects[:0]
-	renderersLock.RLock()
-	for wid, rinfo := range renderers {
-		if rinfo.isExpired(now) {
-			rinfo.renderer.Destroy()
-			overrides.Delete(wid)
-			expiredObjects = append(expiredObjects, wid)
-		}
-	}
-	renderersLock.RUnlock()
-	if len(expiredObjects) > 0 {
-		renderersLock.Lock()
-		for i, exp := range expiredObjects {
-			delete(renderers, exp.(fyne.Widget))
-			expiredObjects[i] = nil
-		}
-		renderersLock.Unlock()
 	}
 }
 
